@@ -1,0 +1,30 @@
+## Demo
+
+```bash
+cd ~
+mkdir -p ./mqtt_ws/src
+cd mqtt_ws/src
+git clone https://github.com/integemjack/mqtt
+cd mqtt
+sudo apt install python3-pip -y
+sudo apt install ros-noetic-rosbridge-library -y
+sudo pip3 install dev-requirements.txt
+cd ~/mqtt_ws
+catkin_make
+cd devel
+source setup.bash
+```
+
+# 启动
+
+```bash
+roslaunch mqtt_bridge demo.launch
+mosquitto_sub -t '#'
+```
+
+# 发送指令输出指令
+
+```bash
+rostopic pub /echo std_msgs/String "data: 'hello'"
+rostopic pub /ping std_msgs/Bool "data: true"
+```
