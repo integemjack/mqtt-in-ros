@@ -17,12 +17,21 @@ source setup.bash
 
 # 启动
 
+## 终端 1
+
 ```bash
 roslaunch mqtt_bridge demo.launch
+```
+
+## 终端 2
+
+```bash
 mosquitto_sub -t '#'
 ```
 
 # 发送指令输出指令
+
+## 终端 3
 
 ```bash
 rostopic pub /echo std_msgs/String "data: 'hello'"
