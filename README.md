@@ -20,7 +20,7 @@ source setup.bash
 ## 终端 1
 
 ```bash
-cd ~/mqtt_ws/src/mqtt/script/
+cd ~/mqtt_ws/src/mqtt/scripts/
 roslaunch mqtt_bridge demo.launch
 ```
 
