@@ -37,11 +37,10 @@ sudo ldconfig
 mkdir -p ~/ros_workspace/src
 git clone https://github.com/dusty-nv/ros_deep_learning ~/ros_workspace/src/ros_deep_learning
 cd ~/ros_workspace
-sudo apt install python-catkin-tools
+sudo apt install python-catkin-tools -y
 catkin_make
 cd ~/ros_workspace/devel
 source ./setup.bash
-
 
 # 如果catkin_make 不存在时
 # sudo apt install python-catkin-tools

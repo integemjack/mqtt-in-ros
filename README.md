@@ -13,6 +13,8 @@ cd ~/mqtt_ws
 catkin_make
 cd devel
 source setup.bash
+pip3 install rospkg
+chmod +x ~/mqtt_ws
 ```
 
 # 启动
