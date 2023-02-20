@@ -1,0 +1,22 @@
+name: Release
+
+# on:
+#   schedule:
+#     # * is a special character in YAML so you have to quote this string
+#     - cron: "5 * * * *"
+on: [push]
+
+jobs:
+  release:
+    name: Release
+
+    runs-on: macOS-latest
+
+    steps:
+
+      - name: init
+        uses: actions/checkout@v1
+      
+      - name: test
+        shell: bash
+        run: bash init.sh
