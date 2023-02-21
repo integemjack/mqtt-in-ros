@@ -8,7 +8,8 @@ git clone https://github.com/integemjack/mqtt
 cd mqtt
 sudo apt install python3-pip -y
 sudo apt install ros-melodic-rosbridge-library -y
-sudo pip3 install dev-requirements.txt
+pip3 install -r dev-requirements.txt
+sudo pip3 install -r dev-requirements.txt
 cd ~/mqtt_ws
 catkin_make
 cd devel
