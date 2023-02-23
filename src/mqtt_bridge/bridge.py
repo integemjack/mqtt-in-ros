@@ -49,13 +49,14 @@ class RosToMqttBridge(Bridge):
         rospy.Subscriber(topic_from, msg_type, self._callback_ros)
 
     def _callback_ros(self, msg: rospy.Message):
-        rospy.logdebug("ROS received from {}".format(self._topic_from))
+        rospy.loginfo("ROS received from {}".format(self._topic_from))
         now = rospy.get_time()
         if now - self._last_published >= self._interval:
             self._publish(msg)
             self._last_published = now
 
     def _publish(self, msg: rospy.Message):
+        rospy.loginfo("MQTT send from {}".format(self._topic_to))
         payload = self._serialize(extract_values(msg))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
@@ -76,7 +77,8 @@ class MqttToRosBridge(Bridge):
         self._interval = None if frequency is None else 1.0 / frequency
         # Adding the correct topic to subscribe to
         self._mqtt_client.subscribe(self._topic_from)
-        self._mqtt_client.message_callback_add(self._topic_from, self._callback_mqtt)
+        self._mqtt_client.message_callback_add(
+            self._topic_from, self._callback_mqtt)
         self._publisher = rospy.Publisher(
             self._topic_to, self._msg_type, queue_size=self._queue_size)
 
