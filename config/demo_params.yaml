@@ -36,7 +36,7 @@ bridge:
     msg_type: std_msgs.msg:String
     topic_from: ~/echo
     topic_to: /private/back
-  - factory: mqtt_bridge.bridge:MqttToRosBridge
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
     msg_type: vision_msgs.msg:Detection2DArray
     topic_from: /detectnet/detections
     topic_to: car
