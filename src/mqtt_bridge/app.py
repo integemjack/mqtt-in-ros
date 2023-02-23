@@ -23,7 +23,7 @@ def create_config(mqtt_client, serializer, deserializer, mqtt_private_path):
 
 def mqtt_bridge_node():
     # init node
-    rospy.init_node('mqtt_bridge_node')
+    rospy.init_node('mqtt_bridge_node', anonymous=True)
 
     # load parameters
     params = rospy.get_param("~", {})
