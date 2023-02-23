@@ -4,6 +4,7 @@ from typing import Optional, Type, Dict, Union
 import inject
 import paho.mqtt.client as mqtt
 import rospy
+import yaml
 
 from .util import lookup_object, extract_values, populate_instance
 
@@ -57,7 +58,8 @@ class RosToMqttBridge(Bridge):
 
     def _publish(self, msg: rospy.Message):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
-        payload = self._serialize(extract_values(msg))
+        # rospy.loginfo(yaml.dump(msg))
+        payload = self._serialize(yaml.dump(msg)) # extract_values(msg))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
 
