@@ -106,12 +106,12 @@ class MqttToRosBridge(Bridge):
             rospy.loginfo(self.proc)
 
         if mqtt_msg.payload == b'stop':
-            if self.proc:
+            try:
                 self.proc.terminate()
                 self.proc.wait()
                 os.killpg(self.proc.pid, signal.SIGTERM) 
                 rospy.loginfo("stoped!")
-            else:
+            except:
                 rospy.loginfo("no ros to stop...")
 
         if self._topic_to != "":
