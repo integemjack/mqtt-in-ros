@@ -50,3 +50,10 @@ mosquitto_sub -t '#'
 rostopic pub /echo std_msgs/String "data: 'hello'"
 rostopic pub /ping std_msgs/Bool "data: true"
 ```
+
+
+# 启动 detectnet 方法
+```bash
+mosquitto_pub -t 'car' -m 'start' # 启动
+mosquitto_pub -t 'car' -m 'stop'  # 关闭
+```
