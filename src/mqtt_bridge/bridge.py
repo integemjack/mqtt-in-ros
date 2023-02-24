@@ -103,6 +103,7 @@ class MqttToRosBridge(Bridge):
             # print("second time get pid ")
             # print(os.getpid())
             rospy.loginfo("started!")
+            rospy.loginfo(self.proc)
 
         if mqtt_msg.payload == b'stop':
             if self.proc:
