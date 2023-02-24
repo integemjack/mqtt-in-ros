@@ -1,6 +1,6 @@
 mqtt:
   client:
-    protocol: 4      # MQTTv311
+    protocol: 4 # MQTTv311
   connection:
     host: localhost
     port: 1883
@@ -40,3 +40,7 @@ bridge:
     msg_type: vision_msgs.msg:Detection2DArray
     topic_from: /detectnet/detections
     topic_to: car
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: vision_msgs.msg:Detection2DArray
+    topic_from: car
+    topic_to: ""

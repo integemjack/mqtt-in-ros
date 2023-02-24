@@ -5,6 +5,8 @@ import inject
 import paho.mqtt.client as mqtt
 import rospy
 import yaml
+import subprocess,os
+import signal
 
 from .util import lookup_object, extract_values, populate_instance
 
@@ -81,21 +83,38 @@ class MqttToRosBridge(Bridge):
         self._mqtt_client.subscribe(self._topic_from)
         self._mqtt_client.message_callback_add(
             self._topic_from, self._callback_mqtt)
-        self._publisher = rospy.Publisher(
-            self._topic_to, self._msg_type, queue_size=self._queue_size)
+        
+        if self._topic_to != "":
+            self._publisher = rospy.Publisher(
+                self._topic_to, self._msg_type, queue_size=self._queue_size)
 
     def _callback_mqtt(self, client: mqtt.Client, userdata: Dict, mqtt_msg: mqtt.MQTTMessage):
         """ callback from MQTT """
         rospy.logdebug("MQTT received from {}".format(mqtt_msg.topic))
         now = rospy.get_time()
 
-        if self._interval is None or now - self._last_published >= self._interval:
-            try:
-                ros_msg = self._create_ros_message(mqtt_msg)
-                self._publisher.publish(ros_msg)
-                self._last_published = now
-            except Exception as e:
-                rospy.logerr(e)
+        if mqtt_msg == "start":
+            cmd = "cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=csi://0 output:=display://0"
+            self.proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=-1,preexec_fn=os.setsid)
+            rospy.loginfo("started!")
+
+        if mqtt_msg == "stop":
+            if self.proc:
+                self.proc.terminate()
+                self.proc.wait()
+                os.killpg(self.proc.pid, signal.SIGTERM) 
+                rospy.loginfo("stoped!")
+            else:
+                rospy.loginfo("no ros to stop...")
+
+        if self._topic_to != "":
+            if self._interval is None or now - self._last_published >= self._interval:
+                try:
+                    ros_msg = self._create_ros_message(mqtt_msg)
+                    self._publisher.publish(ros_msg)
+                    self._last_published = now
+                except Exception as e:
+                    rospy.logerr(e)
 
     def _create_ros_message(self, mqtt_msg: mqtt.MQTTMessage) -> rospy.Message:
         """ create ROS message from MQTT payload """
