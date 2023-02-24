@@ -94,12 +94,12 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
 
-        if mqtt_msg == "start":
+        if mqtt_msg.payload == b'start':
             cmd = "cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=csi://0 output:=display://0"
             self.proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=-1,preexec_fn=os.setsid)
             rospy.loginfo("started!")
 
-        if mqtt_msg == "stop":
+        if mqtt_msg.payload == b'stop':
             if self.proc:
                 self.proc.terminate()
                 self.proc.wait()
