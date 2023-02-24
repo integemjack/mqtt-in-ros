@@ -41,6 +41,6 @@ bridge:
     topic_from: /detectnet/detections
     topic_to: car
   - factory: mqtt_bridge.bridge:MqttToRosBridge
-    msg_type: vision_msgs.msg:Detection2DArray
+    msg_type: std_msgs.msg:String
     topic_from: car
     topic_to: ""
