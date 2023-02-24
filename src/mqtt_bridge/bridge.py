@@ -90,7 +90,7 @@ class MqttToRosBridge(Bridge):
 
     def _callback_mqtt(self, client: mqtt.Client, userdata: Dict, mqtt_msg: mqtt.MQTTMessage):
         """ callback from MQTT """
-        rospy.logdebug("MQTT received from {}".format(mqtt_msg.topic))
+        rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
         now = rospy.get_time()
 
         if mqtt_msg == "start":
