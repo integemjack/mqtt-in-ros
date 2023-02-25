@@ -57,3 +57,10 @@ rostopic pub /ping std_msgs/Bool "data: true"
 mosquitto_pub -t 'car' -m 'start' # 启动
 mosquitto_pub -t 'car' -m 'stop'  # 关闭
 ```
+
+
+# vnc server
+```bash
+sudo apt install x11vnc
+x11vnc -passwd gy666661 -display :0 -forever
+```
