@@ -5,7 +5,8 @@ import inject
 import paho.mqtt.client as mqtt
 import rospy
 import yaml
-import subprocess,os
+import subprocess
+import os
 import signal
 
 from .util import lookup_object, extract_values, populate_instance
@@ -61,7 +62,7 @@ class RosToMqttBridge(Bridge):
     def _publish(self, msg: rospy.Message):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(yaml.dump(msg))
-        payload = self._serialize(yaml.dump(msg)) # extract_values(msg))
+        payload = self._serialize(yaml.dump(msg))  # extract_values(msg))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
 
@@ -83,7 +84,7 @@ class MqttToRosBridge(Bridge):
         self._mqtt_client.subscribe(self._topic_from)
         self._mqtt_client.message_callback_add(
             self._topic_from, self._callback_mqtt)
-        
+
         if self._topic_to != "":
             self._publisher = rospy.Publisher(
                 self._topic_to, self._msg_type, queue_size=self._queue_size)
@@ -94,10 +95,14 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
 
+        rospy.loginfo(mqtt_msg.payload.split(":"))
+
         if mqtt_msg.payload == b'start':
             cmd = "cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://192.168.0.42:1234"
             rospy.loginfo(cmd)
-            self.proc = subprocess.Popen(cmd, shell=True, executable="/bin/bash") #, preexec_fn=os.setsid)
+            # , preexec_fn=os.setsid)
+            self.proc = subprocess.Popen(
+                cmd, shell=True, executable="/bin/bash")
             # print(os.getpid())
             # os.system(cmd)
             # print("second time get pid ")
@@ -109,7 +114,7 @@ class MqttToRosBridge(Bridge):
             try:
                 self.proc.terminate()
                 self.proc.wait()
-                os.killpg(self.proc.pid, signal.SIGTERM) 
+                os.killpg(self.proc.pid, signal.SIGTERM)
                 rospy.loginfo("stoped!")
             except:
                 rospy.loginfo("no ros to stop...")
