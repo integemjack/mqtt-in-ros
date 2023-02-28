@@ -95,7 +95,7 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
 
-        rospy.loginfo(mqtt_msg.payload.split(":"))
+        rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
 
         if mqtt_msg.payload == b'start':
             cmd = "cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://192.168.0.42:1234"
