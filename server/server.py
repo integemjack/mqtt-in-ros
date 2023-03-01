@@ -57,8 +57,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.wfile.write(buf.encode())
  
     def do_POST(self):
-        #获取post提交的数据
-        # datas = self.rfile.read(int(self.headers['content-length']))    #固定格式，获取表单提交的数据
+        # datas = self.rfile.read(int(self.headers['content-length']))
         #datas = urllib.unquote(datas).decode("utf-8", 'ignore')
  
         self.send_response(200)
