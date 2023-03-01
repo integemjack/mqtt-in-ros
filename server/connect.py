@@ -3,7 +3,7 @@ import subprocess, os
 import urllib
 import uuid
 
-host = ('', 80)
+host = ('', 8080)
  
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
