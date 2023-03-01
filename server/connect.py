@@ -3,7 +3,7 @@ import subprocess, os
 import urllib
 import uuid
 
-host = ('', 8080)
+host = ('', 80)
  
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
@@ -28,7 +28,7 @@ class Resquest(BaseHTTPRequestHandler):
         port = ips[1]
 
         buf = 'no function'
-        print(machineId())
+        print('machineId: ', machineId(), '  topic: ', topic)
         if machineId() != topic:
             return self.wfile.write('No this device!'.encode())
 
