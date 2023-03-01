@@ -1,3 +1,11 @@
+name="car$1"
+
+echo "car: $name"
+
+sudo echo $name > /machineId
+
+
+
 # install ros
 
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -44,3 +52,23 @@ source ./setup.bash
 
 # 如果catkin_make 不存在时
 # sudo apt install python-catkin-tools
+
+# install mqtt
+mkdir -p ~/mqtt_ws/src
+git clone https://github.com/integemjack/mqtt ~/mqtt_ws/src/mqtt
+cd ~/mqtt_ws/src/mqtt
+sudo apt install python3-pip -y
+sudo apt install ros-melodic-rosbridge-library -y
+pip3 install -r dev-requirements.txt
+sudo pip3 install -r dev-requirements.txt
+cd ~/mqtt_ws
+catkin_make
+cd devel
+source setup.bash
+pip3 install rospkg
+chmod +x -R ~/mqtt_ws
+
+
+sudo mv server/server.service /etc/systemd/system/httpserver.service
+sudo systemctl enable httpserver
+sudo systemctl start httpserver
