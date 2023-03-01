@@ -90,7 +90,7 @@ def machineId():
   if (mid == ''):
     mid = uuid.uuid4()
     writeFile('/machineId', str(mid) + '')
-  return mid
+  return mid.strip()
 
 if __name__ == '__main__':
     server = HTTPServer(host, Resquest)
