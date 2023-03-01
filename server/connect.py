@@ -33,7 +33,7 @@ class Resquest(BaseHTTPRequestHandler):
             return self.wfile.write('No this device!'.encode())
 
         if path == '/connect':
-            cmd = "sed -i \"s/host: localhost/host: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && sed -i \"s/port: 1883/port: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && cd /home/nvidia/mqtt_ws/devel && source setup.bash && roslaunch mqtt_bridge demo.launch".format(
+            cmd = "sed -i \"s/host: localhost/host: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && sed -i \"s/port: 1883/port: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && chmod +x -R /home/nvidia/mqtt_ws && cd /home/nvidia/mqtt_ws/devel && source setup.bash && roslaunch mqtt_bridge demo.launch".format(
                 ip, port)
             print("Command: ", cmd)
             self.proc = subprocess.Popen(
@@ -45,10 +45,10 @@ class Resquest(BaseHTTPRequestHandler):
                 self.proc.terminate()
                 self.proc.wait()
                 os.killpg(self.proc.pid, signal.SIGTERM)
-                rospy.loginfo("stoped!")
+                print("stoped!")
                 buf = 'ok'
             except:
-                rospy.loginfo("no ros to stop...")
+                print("no ros to stop...")
                 buf = 'no ros to stop...'
 
         elif path == '/status':
