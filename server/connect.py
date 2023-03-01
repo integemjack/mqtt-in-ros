@@ -28,7 +28,7 @@ class Resquest(BaseHTTPRequestHandler):
         port = ips[1]
 
         buf = 'no function'
-        print('machineId: ', machineId(), '  topic: ', topic)
+        print('machineId: "', machineId(), '"  topic: ', topic)
         if machineId() != topic:
             return self.wfile.write('No this device!'.encode())
 
