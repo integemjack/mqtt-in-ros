@@ -35,7 +35,7 @@ class Resquest(BaseHTTPRequestHandler):
         if path == '/connect':
             cmd = "sed -i \"s/host: localhost/host: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && sed -i \"s/port: 1883/port: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && cd /home/nvidia/mqtt_ws/devel && source setup.bash && roslaunch mqtt_bridge demo.launch".format(
                 ip, port)
-            rospy.loginfo(cmd)
+            print("Command: ", cmd)
             self.proc = subprocess.Popen(
                 cmd, shell=True, executable="/bin/bash")
             buf = 'ok'
