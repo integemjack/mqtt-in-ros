@@ -114,8 +114,8 @@ class MqttToRosBridge(Bridge):
 
         if msg[0] == 'stop':
             try:
-                self.proc.terminate()
-                self.proc.wait()
+                # self.proc.terminate()
+                self.proc.kill()
                 os.killpg(self.proc.pid, signal.SIGTERM)
                 rospy.loginfo("stoped!")
             except:
