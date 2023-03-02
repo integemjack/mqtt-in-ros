@@ -22,8 +22,8 @@ class Resquest(BaseHTTPRequestHandler):
         params=urllib.parse.parse_qs(self.queryString)     
         print(params)
 
-        topic = params['topic'][0]
-        ips = params['ip'][0].split(':',1)
+        topic = params['machineid'][0]
+        ips = params['mqtt_ip'][0].split(':',1)
         ip = ips[0]
         port = ips[1]
 
