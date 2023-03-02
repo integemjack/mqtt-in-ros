@@ -43,6 +43,7 @@ class Resquest(BaseHTTPRequestHandler):
 
         elif path == '/stop':
             try:
+                print("id:", self.proc.pid)
                 self.proc.terminate()
                 self.proc.wait()
                 os.killpg(self.proc.pid, signal.SIGTERM)
