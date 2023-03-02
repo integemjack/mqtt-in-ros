@@ -2,6 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess, os
 import urllib
 import uuid
+import signal
 
 host = ('', 80)
  
