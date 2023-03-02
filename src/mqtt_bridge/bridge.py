@@ -104,7 +104,7 @@ class MqttToRosBridge(Bridge):
             rospy.loginfo(cmd)
             # , preexec_fn=os.setsid)
             self.proc = subprocess.Popen(
-                cmd, shell=True, executable="/bin/bash")
+                cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
             # print(os.getpid())
             # os.system(cmd)
             # print("second time get pid ")
@@ -114,8 +114,8 @@ class MqttToRosBridge(Bridge):
 
         if msg[0] == 'stop':
             try:
-                # self.proc.terminate()
-                self.proc.kill()
+                self.proc.terminate()
+                self.proc.wait()
                 os.killpg(self.proc.pid, signal.SIGTERM)
                 rospy.loginfo("stoped!")
             except:

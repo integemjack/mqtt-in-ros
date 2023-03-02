@@ -37,13 +37,13 @@ class Resquest(BaseHTTPRequestHandler):
                 ip, port)
             print("Command: ", cmd)
             self.proc = subprocess.Popen(
-                cmd, shell=True, executable="/bin/bash")
+                cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
             buf = 'ok'
 
         elif path == '/stop':
             try:
-                # self.proc.terminate()
-                self.proc.kill()
+                self.proc.terminate()
+                self.proc.wait()
                 os.killpg(self.proc.pid, signal.SIGTERM)
                 print("stoped!")
                 buf = 'ok'
