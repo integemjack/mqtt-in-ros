@@ -69,6 +69,6 @@ pip3 install rospkg
 chmod +x -R ~/mqtt_ws
 
 
-sudo mv server/connect.service /etc/systemd/system/connect.service
+sudo mv ~/mqtt_ws/src/mqtt/server/connect.service /etc/systemd/system/connect.service
 sudo systemctl enable connect
 sudo systemctl start connect
