@@ -5,6 +5,7 @@ import uuid
 import signal
 
 host = ('', 80)
+pid = 0
  
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
@@ -27,6 +28,7 @@ class Resquest(BaseHTTPRequestHandler):
         ips = params['mqtt_ip'][0].split(':',1)
         ip = ips[0]
         port = ips[1]
+        global pid
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -40,15 +42,21 @@ class Resquest(BaseHTTPRequestHandler):
             self.proc = subprocess.Popen(
                 cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
             buf = 'ok'
+            pid = self.proc.pid
 
         elif path == '/stop':
+            print("pid", pid)
             try:
-                print("id:", self.proc.pid)
-                self.proc.terminate()
-                self.proc.wait()
-                os.killpg(self.proc.pid, signal.SIGTERM)
-                print("stoped!")
-                buf = 'ok'
+                # print("id:", self.proc)
+                # self.proc.terminate()
+                # self.proc.wait()
+                if pid != 0:
+                  os.killpg(pid, signal.SIGTERM)
+                  print("stoped!")
+                  buf = 'ok'
+                else:
+                  print("no stop!")
+                  buf = 'no stop!'
             except:
                 print("no ros to stop...")
                 buf = 'no ros to stop...'

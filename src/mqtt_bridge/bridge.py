@@ -8,9 +8,21 @@ import yaml
 import subprocess
 import os
 import signal
+import atexit
 
 from .util import lookup_object, extract_values, populate_instance
 
+pid = 0
+
+def f():
+    if pid != 0:
+        os.killpg(pid, signal.SIGTERM)
+        rospy.loginfo("stoped!")
+    else:
+        rospy.loginfo("no stop!")
+ 
+ 
+atexit.register(f)
 
 def create_bridge(factory: Union[str, "Bridge"], msg_type: Union[str, Type[rospy.Message]], topic_from: str,
                   topic_to: str, frequency: Optional[float] = None, **kwargs) -> "Bridge":
@@ -94,6 +106,7 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
         rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
+        global pid
 
         msg = mqtt_msg.payload.decode('UTF-8').split(":")
         rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
@@ -111,13 +124,17 @@ class MqttToRosBridge(Bridge):
             # print(os.getpid())
             rospy.loginfo("started!")
             rospy.loginfo(self.proc)
+            pid = self.proc.pid
 
         if msg[0] == 'stop':
             try:
-                self.proc.terminate()
-                self.proc.wait()
-                os.killpg(self.proc.pid, signal.SIGTERM)
-                rospy.loginfo("stoped!")
+                # self.proc.terminate()
+                # self.proc.wait()
+                if pid != 0:
+                    os.killpg(pid, signal.SIGTERM)
+                    rospy.loginfo("stoped!")
+                else:
+                    rospy.loginfo("no stop!")
             except:
                 rospy.loginfo("no ros to stop...")
 
