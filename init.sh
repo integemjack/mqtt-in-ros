@@ -31,10 +31,10 @@ rosdep update
 
 cd ~
 sudo apt-get install git cmake -y
-git clone --recursive https://github.com/dusty-nv/jetson-inference
-cd jetson-inference
-mkdir build
-cd build
+git clone --recursive https://github.com/dusty-nv/jetson-inference ~/jetson-inference
+cd ~/jetson-inference
+mkdir -p ~/jetson-inference/build
+cd ~/jetson-inference/build
 cmake ../
 make -j$(nproc)
 sudo make install
