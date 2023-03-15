@@ -64,3 +64,36 @@ mosquitto_pub -t 'car' -m 'stop'  # 关闭
 sudo apt install x11vnc
 x11vnc -passwd gy666661 -display :0 -forever
 ```
+
+
+# apriltag
+```
+
+cd ~
+wget https://www.raoyunsoft.com/opencv/opencv-3.4.16/opencv-3.4.16.zip
+unzip opencv-3.4.16.zip
+cd opencv-3.4.16
+mkdir build
+cd build
+cmake ..
+make -j4
+sudo make install
+
+sudo apt install libopencv-dev=3.2.0+dfsg-4ubuntu0.1
+
+
+mkdir -p ~/apriltag_ws/src
+cd ~/apriltag_ws/src
+git clone https://github.com/AprilRobotics/apriltag.git
+git clone https://github.com/AprilRobotics/apriltag_ros.git
+cd ~/apriltag_ws
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make
+catkin_make_isolated
+
+chmod +x -R ~/apriltag_ws
+cd ~/apriltag_ws/devel_isolated
+source setup.bash
+
+roslaunch apriltag_ros continuous_detection.launch
+```
