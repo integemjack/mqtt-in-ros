@@ -68,7 +68,7 @@ x11vnc -passwd gy666661 -display :0 -forever
 
 # apriltag
 ```
-
+# 安装opencv
 cd ~
 wget https://www.raoyunsoft.com/opencv/opencv-3.4.16/opencv-3.4.16.zip
 unzip opencv-3.4.16.zip
@@ -79,9 +79,10 @@ cmake ..
 make -j4
 sudo make install
 
+# 安装opencv必要库
 sudo apt install libopencv-dev=3.2.0+dfsg-4ubuntu0.1
 
-
+# 编译apriltag
 mkdir -p ~/apriltag_ws/src
 cd ~/apriltag_ws/src
 git clone https://github.com/AprilRobotics/apriltag.git
@@ -91,9 +92,11 @@ rosdep install --from-paths src --ignore-src -r -y
 catkin_make
 catkin_make_isolated
 
+# 使用前操作
 chmod +x -R ~/apriltag_ws
 cd ~/apriltag_ws/devel_isolated
 source setup.bash
 
+# 运行核心
 roslaunch apriltag_ros continuous_detection.launch
 ```
