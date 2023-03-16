@@ -70,8 +70,10 @@ x11vnc -passwd gy666661 -display :0 -forever
 ```
 # 安装opencv
 cd ~
-wget https://www.raoyunsoft.com/opencv/opencv-3.4.16/opencv-3.4.16.zip
-unzip opencv-3.4.16.zip
+#wget https://www.raoyunsoft.com/opencv/opencv-3.4.16/opencv-3.4.16.zip
+#unzip opencv-3.4.16.zip
+https://github.com/opencv/opencv/archive/refs/tags/3.4.16.zip
+unzip 3.4.16.zip
 cd opencv-3.4.16
 mkdir build
 cd build
