@@ -102,3 +102,55 @@ source setup.bash
 # 运行核心
 roslaunch apriltag_ros continuous_detection.launch
 ```
+
+# usb_cam
+```bash
+mkdir ~/usb_cam_ws/src
+cd ~/usb_cam_ws/src
+git clone https://github.com/bosch-ros-pkg/usb_cam.git
+cd ~/usb_cam_ws
+catkin_make
+
+sudo apt-get install ros-melodic-usb-cam
+
+roslaunch usb_cam usb_cam-test.launch
+```
+
+## 修改 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/launch/continuous_detection.launch
+```
+<arg name="camera_name" default="/usb_cam" />
+<arg name="camera_frame" default="usb_cam" />   #发布一个坐标系
+<arg name="image_topic" default="image_raw" />
+```
+
+## 修改 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/config/tags.yaml
+```json
+standalone_tags:
+  [
+    {id: 1, size: 0.05},
+    {id: 2, size: 0.05},
+    {id: 22, size: 0.05},
+    {id: 45, size: 0.05},
+  
+  ]
+tag_bundles:
+  [
+    {
+      name: 'my_bundle',
+      layout:
+        [
+          {id: 10, size: 0.05, x: 0.0000, y: 0.0000, z: 0.0, qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0},
+          {id: 22, size: 0.05, x: 0.0000, y: 0.0000, z: 0.0, qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0},
+          {id: 45, size: 0.05, x: 0.0000, y: 0.0000, z: 0.0, qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0}
+        ]
+     } 
+  ]
+```
+
+## 运行 apriltag
+```bash
+roslaunch apriltag_ros continuous_detection.launch
+
+# 查看输出信息
+rostopic echo /tag_detections
+```
