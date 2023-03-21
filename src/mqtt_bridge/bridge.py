@@ -16,6 +16,7 @@ from .util import lookup_object, extract_values, populate_instance
 pid = []
 
 def f():
+    global pid
     if len(pid) > 0:
         for p in pid:
             os.killpg(p, signal.SIGTERM)
