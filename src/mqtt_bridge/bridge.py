@@ -128,7 +128,7 @@ class MqttToRosBridge(Bridge):
                 for c in cmd:
                     cs = c.split(":")
                     if cs[0] == 'sleep':
-                        time.sleep(cs[1])
+                        time.sleep(int(cs[1]))
                     elif cs[0] != 'sleep':
                         self.proc = subprocess.Popen(
                             c, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
