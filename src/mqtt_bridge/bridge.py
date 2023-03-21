@@ -112,56 +112,60 @@ class MqttToRosBridge(Bridge):
         now = rospy.get_time()
         global pid
 
-        msg = mqtt_msg.payload.decode('UTF-8').split(":")
-        rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
+        try:
+            msg = mqtt_msg.payload.decode('UTF-8').split(":")
+            rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
 
-        if msg[0] == 'start':
-            cmd = []
-            if msg[1] == 'detectnet':
-                cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{}".format(
-                    msg[2], msg[3])]
-            elif msg[1] == 'apriltag':
-                cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
-            rospy.loginfo(cmd)
-            # , preexec_fn=os.setsid)
-            if len(cmd) > 0:
-                for c in cmd:
-                    cs = c.split(":")
-                    if cs[0] == 'sleep':
-                        time.sleep(int(cs[1]))
-                    elif cs[0] != 'sleep':
-                        self.proc = subprocess.Popen(
-                            c, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
-                        # print(os.getpid())
-                        # os.system(cmd)
-                        # print("second time get pid ")
-                        # print(os.getpid())
-                        rospy.loginfo("started!")
-                        rospy.loginfo(self.proc)
-                        pid.append(self.proc.pid)
+            if msg[0] == 'start':
+                cmd = []
+                if msg[1] == 'detectnet':
+                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{}".format(
+                        msg[2], msg[3])]
+                elif msg[1] == 'apriltag':
+                    cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
+                rospy.loginfo(cmd)
+                # , preexec_fn=os.setsid)
+                if len(cmd) > 0:
+                    for c in cmd:
+                        cs = c.split(":")
+                        if cs[0] == 'sleep':
+                            time.sleep(int(cs[1]))
+                        elif cs[0] != 'sleep':
+                            self.proc = subprocess.Popen(
+                                c, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
+                            # print(os.getpid())
+                            # os.system(cmd)
+                            # print("second time get pid ")
+                            # print(os.getpid())
+                            rospy.loginfo("started!")
+                            rospy.loginfo(self.proc)
+                            pid.append(self.proc.pid)
 
-        if msg[0] == 'stop':
-            try:
-                # self.proc.terminate()
-                # self.proc.wait()
-                if len(pid) > 0:
-                    for p in pid:
-                        os.killpg(p, signal.SIGTERM)
-                    pid = []
-                    rospy.loginfo("stoped!")
-                else:
-                    rospy.loginfo("no stop!")
-            except:
-                rospy.loginfo("no ros to stop...")
-
-        if self._topic_to != "":
-            if self._interval is None or now - self._last_published >= self._interval:
+            if msg[0] == 'stop':
                 try:
-                    ros_msg = self._create_ros_message(mqtt_msg)
-                    self._publisher.publish(ros_msg)
-                    self._last_published = now
-                except Exception as e:
-                    rospy.logerr(e)
+                    # self.proc.terminate()
+                    # self.proc.wait()
+                    if len(pid) > 0:
+                        for p in pid:
+                            os.killpg(p, signal.SIGTERM)
+                        pid = []
+                        rospy.loginfo("stoped!")
+                    else:
+                        rospy.loginfo("no stop!")
+                except:
+                    rospy.loginfo("no ros to stop...")
+
+            if self._topic_to != "":
+                if self._interval is None or now - self._last_published >= self._interval:
+                    try:
+                        ros_msg = self._create_ros_message(mqtt_msg)
+                        self._publisher.publish(ros_msg)
+                        self._last_published = now
+                    except Exception as e:
+                        rospy.logerr(e)
+        except Exception as e:
+            rospy.logerr(e)
+
 
     def _create_ros_message(self, mqtt_msg: mqtt.MQTTMessage) -> rospy.Message:
         """ create ROS message from MQTT payload """
