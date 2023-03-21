@@ -9,14 +9,17 @@ import subprocess
 import os
 import signal
 import atexit
+import time
 
 from .util import lookup_object, extract_values, populate_instance
 
-pid = 0
+pid = []
 
 def f():
-    if pid != 0:
-        os.killpg(pid, signal.SIGTERM)
+    if len(pid) > 0:
+        for p in pid:
+            os.killpg(p, signal.SIGTERM)
+        pid = []
         rospy.loginfo("stoped!")
     else:
         rospy.loginfo("no stop!")
@@ -112,26 +115,38 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
 
         if msg[0] == 'start':
-            cmd = "cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{}".format(
-                msg[1], msg[2])
+            cmd = []
+            if msg[1] == 'detectnet':
+                cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{}".format(
+                    msg[2], msg[3])]
+            elif msg[1] == 'apriltag':
+                cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
             rospy.loginfo(cmd)
             # , preexec_fn=os.setsid)
-            self.proc = subprocess.Popen(
-                cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
-            # print(os.getpid())
-            # os.system(cmd)
-            # print("second time get pid ")
-            # print(os.getpid())
-            rospy.loginfo("started!")
-            rospy.loginfo(self.proc)
-            pid = self.proc.pid
+            if len(cmd) > 0:
+                for c in cmd:
+                    cs = c.split(":")
+                    if cs[0] == 'sleep':
+                        time.sleep(cs[1])
+                    elif cs[0] != 'sleep':
+                        self.proc = subprocess.Popen(
+                            c, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
+                        # print(os.getpid())
+                        # os.system(cmd)
+                        # print("second time get pid ")
+                        # print(os.getpid())
+                        rospy.loginfo("started!")
+                        rospy.loginfo(self.proc)
+                        pid.append(self.proc.pid)
 
         if msg[0] == 'stop':
             try:
                 # self.proc.terminate()
                 # self.proc.wait()
-                if pid != 0:
-                    os.killpg(pid, signal.SIGTERM)
+                if len(pid) > 0:
+                    for p in pid:
+                        os.killpg(p, signal.SIGTERM)
+                    pid = []
                     rospy.loginfo("stoped!")
                 else:
                     rospy.loginfo("no stop!")
