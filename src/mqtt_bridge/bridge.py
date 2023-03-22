@@ -80,8 +80,8 @@ class RosToMqttBridge(Bridge):
 
     def _publish(self, msg: rospy.Message):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
-        rospy.loginfo(msg)
-        payload = self._serialize(yaml.dump(msg))  # extract_values(msg))
+        rospy.loginfo(msg.detections)
+        payload = self._serialize(yaml.dump(msg.detections))  # extract_values(msg))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
 
