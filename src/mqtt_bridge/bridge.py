@@ -71,6 +71,8 @@ class RosToMqttBridge(Bridge):
     def _callback_ros(self, msg: rospy.Message):
         rospy.loginfo("ROS received from {}".format(self._topic_from))
         if (self._topic_from == '/tag_detections'):
+            rospy.loginfo(msg.detections)
+            rospy.loginfo(len(msg.detections))
             if (len(msg.detections) == 0):
                 return rospy.loginfo("MQTT: No DATA to {}".format(self._topic_to))
         now = rospy.get_time()
@@ -80,7 +82,7 @@ class RosToMqttBridge(Bridge):
 
     def _publish(self, msg: rospy.Message):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
-        rospy.loginfo(msg.detections)
+        # rospy.loginfo(msg.detections)
         payload = self._serialize(yaml.dump(msg.detections))  # extract_values(msg))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
