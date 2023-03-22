@@ -84,7 +84,7 @@ class RosToMqttBridge(Bridge):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(msg.detections)
         if (self._topic_from == '/tag_detections'):
-            payload = ",".join([d.id[0] for d in msg.detections]) #self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+            payload = ",".join(['%s' % (d.id[0]) for d in msg.detections]) #self._serialize(msg.detections[0].id[0])  # extract_values(msg))
             payload = "[{}]".format(payload)
         else:
             payload = self._serialize(yaml.dump(msg))
