@@ -21,6 +21,7 @@ chmod +x -R ~/mqtt_ws
 # 启动
 
 ## 测试
+
 ```bash
 
 roslaunch ros_deep_learning detectnet.ros1.launch input:=csi://0 output:=display://0
@@ -51,22 +52,22 @@ rostopic pub /echo std_msgs/String "data: 'hello'"
 rostopic pub /ping std_msgs/Bool "data: true"
 ```
 
-
 # 启动 detectnet 方法
+
 ```bash
 mosquitto_pub -t 'car' -m 'start' # 启动
 mosquitto_pub -t 'car' -m 'stop'  # 关闭
 ```
 
-
 # vnc server
+
 ```bash
 sudo apt install x11vnc
 x11vnc -passwd gy666661 -display :0 -forever
 ```
 
-
 # apriltag
+
 ```
 # 安装opencv
 cd ~
@@ -82,7 +83,10 @@ make -j4
 sudo make install
 
 # 安装opencv必要库
-sudo apt install libopencv-dev=3.2.0+dfsg-4ubuntu0.1
+sudo apt install libopencv-dev=3.2.0+dfsg-4ubuntu0.1 -y
+
+# 安装apriltag数据类型库
+sudo apt install ros-melodic-apriltag-ros -y
 
 # 编译apriltag
 mkdir -p ~/apriltag_ws/src
@@ -104,6 +108,7 @@ roslaunch apriltag_ros continuous_detection.launch
 ```
 
 # usb_cam
+
 ```bash
 mkdir ~/usb_cam_ws/src
 cd ~/usb_cam_ws/src
@@ -117,6 +122,7 @@ roslaunch usb_cam usb_cam-test.launch
 ```
 
 ## 修改 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/launch/continuous_detection.launch
+
 ```
 <arg name="camera_name" default="/usb_cam" />
 <arg name="camera_frame" default="usb_cam" />   #发布一个坐标系
@@ -124,6 +130,7 @@ roslaunch usb_cam usb_cam-test.launch
 ```
 
 ## 修改 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/config/tags.yaml
+
 ```json
 standalone_tags:
   [
@@ -131,7 +138,7 @@ standalone_tags:
     {id: 2, size: 0.05},
     {id: 22, size: 0.05},
     {id: 45, size: 0.05},
-  
+
   ]
 tag_bundles:
   [
@@ -143,11 +150,12 @@ tag_bundles:
           {id: 22, size: 0.05, x: 0.0000, y: 0.0000, z: 0.0, qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0},
           {id: 45, size: 0.05, x: 0.0000, y: 0.0000, z: 0.0, qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0}
         ]
-     } 
+     }
   ]
 ```
 
 ## 运行 apriltag
+
 ```bash
 roslaunch apriltag_ros continuous_detection.launch
 
