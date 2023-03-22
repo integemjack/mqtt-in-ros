@@ -70,6 +70,9 @@ class RosToMqttBridge(Bridge):
 
     def _callback_ros(self, msg: rospy.Message):
         rospy.loginfo("ROS received from {}".format(self._topic_from))
+        if (self._topic_from == '/tag_detections'):
+            if (len(msg.detections) == 0):
+                return rospy.loginfo("MQTT: No DATA to {}".format(self._topic_to))
         now = rospy.get_time()
         if now - self._last_published >= self._interval:
             self._publish(msg)
