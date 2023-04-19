@@ -24,8 +24,8 @@ def f():
         rospy.loginfo("stoped!")
     else:
         rospy.loginfo("no stop!")
- 
- 
+
+
 atexit.register(f)
 
 def create_bridge(factory: Union[str, "Bridge"], msg_type: Union[str, Type[rospy.Message]], topic_from: str,
@@ -128,8 +128,8 @@ class MqttToRosBridge(Bridge):
             if msg[0] == 'start':
                 cmd = []
                 if msg[1] == 'detectnet':
-                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{}".format(
-                        msg[2], msg[3])]
+                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
+                        msg[2], msg[3] or 1234, msg[4] or 1280, msg[5] or 720)]
                 elif msg[1] == 'apriltag':
                     cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
                 rospy.loginfo(cmd)
