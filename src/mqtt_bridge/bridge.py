@@ -83,11 +83,11 @@ class RosToMqttBridge(Bridge):
     def _publish(self, msg: rospy.Message):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(msg.detections)
-        if (self._topic_from == '/tag_detections'):
+        if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
             payload = ",".join(['%s' % (d.id[0]) for d in msg.detections]) #self._serialize(msg.detections[0].id[0])  # extract_values(msg))
             payload = "[{}]".format(payload)
         else:
-            payload = self._serialize(yaml.dump(msg))
+            payload = yaml.dump(msg)
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
 
@@ -129,7 +129,7 @@ class MqttToRosBridge(Bridge):
                 cmd = []
                 if msg[1] == 'detectnet':
                     cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
-                        msg[2], msg[3] or 1234, msg[4] or 1280, msg[5] or 720)]
+                        msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480)]
                 elif msg[1] == 'apriltag':
                     cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
                 rospy.loginfo(cmd)
