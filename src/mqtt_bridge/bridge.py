@@ -86,7 +86,7 @@ class RosToMqttBridge(Bridge):
         if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
             payload = ",".join(['%s' % (d.id[0]) for d in msg.detections]) #self._serialize(msg.detections[0].id[0])  # extract_values(msg))
 #             payload = "[{}]".format(payload)
-        else if (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
+        elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
             payload = ",".join(['%s:%.2f' % (d.Class, d.probability) for d in msg.bounding_boxes])
         else:
             payload = yaml.dump(msg)
