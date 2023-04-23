@@ -53,6 +53,35 @@ source ./setup.bash
 # 如果catkin_make 不存在时
 # sudo apt install python-catkin-tools
 
+# 安装opencv
+cd ~
+#wget https://www.raoyunsoft.com/opencv/opencv-3.4.16/opencv-3.4.16.zip
+#unzip opencv-3.4.16.zip
+https://github.com/opencv/opencv/archive/refs/tags/3.4.16.zip
+unzip 3.4.16.zip
+cd opencv-3.4.16
+mkdir build
+cd build
+cmake ..
+make -j4
+sudo make install
+
+# 安装opencv必要库
+sudo apt install libopencv-dev=3.2.0+dfsg-4ubuntu0.1 -y
+
+# 安装apriltag数据类型库
+sudo apt install ros-melodic-apriltag-ros -y
+
+# 编译apriltag
+mkdir -p ~/apriltag_ws/src
+cd ~/apriltag_ws/src
+git clone https://github.com/AprilRobotics/apriltag.git
+git clone https://github.com/AprilRobotics/apriltag_ros.git
+cd ~/apriltag_ws
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make
+catkin_make_isolated
+
 # install mqtt
 mkdir -p ~/mqtt_ws/src
 git clone https://github.com/integemjack/mqtt ~/mqtt_ws/src/mqtt
