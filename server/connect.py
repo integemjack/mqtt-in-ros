@@ -25,7 +25,7 @@ class Resquest(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
-        self.send_header("Content-type", "text/plain")
+        self.send_header("Content-type", "text/json")
         self.end_headers()
 
         paths = self.path.split('?', 1)
@@ -120,7 +120,7 @@ class Resquest(BaseHTTPRequestHandler):
                     # Set the timeout for reading subprocess output
                     commandThis.stdout.timeout = 1  # Set timeout to 1 second
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
-
+                    self.send_header("Content-type", "text/plain")
                     while True:
                         
                         try:
