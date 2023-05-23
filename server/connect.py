@@ -104,7 +104,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
-                    commands[proc.pid] = proc
+                    commands.insert(proc.pid, proc)
 
                     self.wfile.write(buf.encode())
 
