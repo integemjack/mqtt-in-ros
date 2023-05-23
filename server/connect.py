@@ -117,7 +117,7 @@ class Resquest(BaseHTTPRequestHandler):
                             break
 
                     # 等待子进程完成
-                    proc.communicate()
+                    # proc.communicate()
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
