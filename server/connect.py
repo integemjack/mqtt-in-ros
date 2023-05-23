@@ -102,7 +102,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/watch':
             if len(params['pid']) > 0:
                 try:
-                    commandThis = commands[params['pid'] * 1]
+                    commandThis = commands[params['pid'][0] * 1]
 
                     # Read one line from the subprocess output
                     output_line = commandThis.stdout.readline()
