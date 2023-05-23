@@ -46,6 +46,9 @@ class Resquest(BaseHTTPRequestHandler):
             return self.wfile.write('No this device!'.encode())
 
         if path == '/connect':
+            if pid != 0:
+                buf = '{"success": false, "error": "MQTT is connected!"}'
+                return self.wfile.write(buf.encode())
             if len(params['mqtt_ip']) > 0:
                 ips = params['mqtt_ip'][0].split(':', 1)
                 ip = ips[0]
@@ -71,6 +74,7 @@ class Resquest(BaseHTTPRequestHandler):
                 if error_line != "":
                     success = "false"
                 buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, pid, output_line, error_line)
+                pid = 0
 
         elif path == '/stop':
             try:
