@@ -53,7 +53,7 @@ class Resquest(BaseHTTPRequestHandler):
                 ip, port)
             print("Command: ", cmd)
             self.proc = subprocess.Popen(
-                cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
+                cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
