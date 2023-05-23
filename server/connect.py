@@ -182,11 +182,9 @@ class Resquest(BaseHTTPRequestHandler):
                                 # Both output and error streams are empty, sleep for a short while
                                 time.sleep(0.1)
 
-                        except subprocess.TimeoutExpired:
+                        except:
                             # Timeout occurred, continue the loop
                             time.sleep(0.1)
-
-                    return
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
