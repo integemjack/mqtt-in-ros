@@ -10,7 +10,7 @@ pid = 0
 ip = '*'
 port = 0
 command = ""
-commands = []
+commands = {}
 
 
 class Resquest(BaseHTTPRequestHandler):
@@ -92,7 +92,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
-                    commands.insert(proc.pid, proc)
+                    commands["%d" % proc.pid] = proc
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
@@ -103,7 +103,7 @@ class Resquest(BaseHTTPRequestHandler):
             if len(params['pid']) > 0:
                 try:
                     print(commands)
-                    commandThis = commands[params['pid'][0] * 1]
+                    commandThis = commands[params['pid'][0]]
                     print(commandThis)
 
                     # Read one line from the subprocess output
