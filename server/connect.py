@@ -58,7 +58,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
-            if returncode is None:
+            if returncode is not None:
                 buf = "{\"suceesss\": false, \"pid\": %d}" % self.proc.pid
 
         elif path == '/stop':
@@ -87,7 +87,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/status':
             mqtt_connect = "false"
             returncode = commands["%d" % pid].poll()
-            if returncode is None:
+            if returncode is not None:
                 mqtt_connect = "true"
             buf = "{" + "\"success\": {}, \"mqtt_ip\": \"{}:{}\", \"device\": \"nano\"".format(
                 mqtt_connect, ip, port) + "}"
