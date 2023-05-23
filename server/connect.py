@@ -4,6 +4,7 @@ import os
 import urllib
 import uuid
 import signal
+import asyncio.subprocess
 
 host = ('', 80)
 pid = 0
@@ -17,7 +18,7 @@ class Resquest(BaseHTTPRequestHandler):
     timeout = 5
     server_version = "ROS"
 
-    def do_GET(self):
+    async def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
@@ -87,22 +88,33 @@ class Resquest(BaseHTTPRequestHandler):
                 try:
                     command = params['command']
                     print(command)
-                    proc = subprocess.Popen(
-                        command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    stdout = ""
-                    for line in iter(proc.stdout.readline, b''):
-                        print(line.decode('utf-8'), end='')
+                    proc = await asyncio.create_subprocess_exec(*command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    # stdout = ""
+                    # for line in iter(proc.stdout.readline, b''):
+                    #     print(line.decode('utf-8'), end='')
+                    #     self.wfile.write(line)
+                    #     stdout += line.decode('utf-8')
+                    # stderr = ""
+                    # for line in iter(proc.stdout.readline, b''):
+                    #     print(line.decode('utf-8'), end='')
+                    #     self.wfile.write(line)
+                    #     stderr += line.decode('utf-8')
+                    # # proc.communicate()
+                    # proc.wait()
+
+                    buf = "{\"suceesss\": true, \"pid\": %d}" % (
+                        proc.pid)
+                    
+                    self.wfile.write(buf.encode())
+                    
+                     # 逐行读取子进程的输出并发送到响应流
+                    while True:
+                        line = proc.stdout.readline
+                        if not line:
+                            break
                         self.wfile.write(line)
-                        stdout += line.decode('utf-8')
-                    stderr = ""
-                    for line in iter(proc.stdout.readline, b''):
-                        print(line.decode('utf-8'), end='')
-                        self.wfile.write(line)
-                        stderr += line.decode('utf-8')
-                    # proc.communicate()
-                    proc.wait()
-                    buf = "{\"suceesss\": true, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (
-                        proc.pid, stdout, stderr)
+                        proc.drain()
+
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
