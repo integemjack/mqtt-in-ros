@@ -102,7 +102,7 @@ class Resquest(BaseHTTPRequestHandler):
                     commands["%d" % proc.pid] = proc
 
                 except Exception as e:
-                    buf = "{\"suceesss\": false, \"error\": %s}" % e
+                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
 
@@ -113,35 +113,31 @@ class Resquest(BaseHTTPRequestHandler):
                     commandThis = commands[params['pid'][0]]
                     print(commandThis)
                     # Set the timeout for reading subprocess output
-                    commandThis.stderr.settimeout(1)  # 设置超时时间为1秒
-                    # Set the timeout for reading subprocess output
-                    commandThis.stdout.settimeout(1)  # 设置超时时间为1秒
+                    commandThis.stdout.timeout = 1  # Set timeout to 1 second
+                    commandThis.stderr.timeout = 1  # Set timeout to 1 second
 
                     while True:
+                        try:
+                            # Read one line from the subprocess output with timeout
+                            output_line = commandThis.stdout.readline().decode('utf-8')
+                            if output_line:
+                                self.wfile.write(output_line.encode('utf-8'))
 
+                            # Read one line from the subprocess error output with timeout
+                            error_line = commandThis.stderr.readline().decode('utf-8')
+                            if error_line:
+                                self.wfile.write(error_line.encode('utf-8'))
 
-                        # Read one line from the subprocess output with timeout
-                        ready = select.select([commandThis.stderr], [], [], 1)
-                        if ready[0]:
-                            output_line = commandThis.stdout.readline()
-                        else:
-                            output_line = b''  # 超时时返回空字符串
+                            if not output_line and not error_line:
+                                # Both output and error streams are empty, sleep for a short while
+                                pass
 
-                        # Write the output line as the response
-                        self.wfile.write(output_line)
-
-                        # Read one line from the subprocess output with timeout
-                        ready = select.select([commandThis.stdout], [], [], 1)
-                        if ready[0]:
-                            output_line = commandThis.stdout.readline()
-                        else:
-                            output_line = b''  # 超时时返回空字符串
-
-                        # Write the output line as the response
-                        self.wfile.write(output_line)
+                        except subprocess.TimeoutExpired:
+                            # Timeout occurred, continue the loop
+                            pass
 
                 except Exception as e:
-                    buf = "{\"suceesss\": false, \"error\": %s}" % e
+                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
 
