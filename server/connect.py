@@ -186,6 +186,8 @@ class Resquest(BaseHTTPRequestHandler):
                             # Timeout occurred, continue the loop
                             time.sleep(0.1)
 
+                        print('读取一次数据...%d...完成.' % i)
+
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
                     self.wfile.write(buf.encode())
