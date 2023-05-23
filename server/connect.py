@@ -92,12 +92,12 @@ class Resquest(BaseHTTPRequestHandler):
                     for line in iter(proc.stdout.readline, b''):
                         # print(line.decode('utf-8'), end='')
                         # self.wfile.write(line)
-                        stdout.append(line.decode('utf-8'))
+                        stdout += line.decode('utf-8')
                     stderr = ""
                     for line in iter(proc.stdout.readline, b''):
                         # print(line.decode('utf-8'), end='')
                         # self.wfile.write(line)
-                        stderr.append(line.decode('utf-8'))
+                        stderr += line.decode('utf-8')
                     proc.communicate()
                     buf = "{\"suceesss\": true, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (
                         proc.pid, stdout, stderr)
