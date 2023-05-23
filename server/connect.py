@@ -82,23 +82,24 @@ class Resquest(BaseHTTPRequestHandler):
                 # print("id:", self.proc)
                 # self.proc.terminate()
                 # self.proc.wait()
+                print(params['pid'])
                 if len(params['pid']) > 0:
                     print("pid", params['pid'])
-                    os.killpg(params['pid'], signal.SIGTERM)
+                    os.killpg(params['pid'][0] * 1, signal.SIGTERM)
                     print("stoped!")
-                    buf = 'ok'
+                    buf = '{"suceess": true, "pid": %d}' % params['pid']
                 elif pid != 0:
                     print("pid", pid)
                     os.killpg(pid, signal.SIGTERM)
                     print("stoped!")
-                    buf = 'ok'
+                    buf = '{"suceess": true, "pid": %d}' % pid
                     pid = 0
                 else:
                     print("no stop!")
-                    buf = 'no stop!'
-            except:
+                    buf = '{"suceess": false, "error": "No stop"}'
+            except Exception as e:
                 print("no ros to stop...")
-                buf = 'no ros to stop...'
+                buf = '{"suceess": false, "error": "%s"}' % e
 
         elif path == '/status':
             mqtt_connect = "false"
