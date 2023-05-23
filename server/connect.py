@@ -90,7 +90,7 @@ class Resquest(BaseHTTPRequestHandler):
                         command, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
                     proc.communicate()
                     buf = "{\"suceesss\": true, \"pid\": %d, \"out\": \"%s\", \"error\": \"%s\"}" % (
-                        proc.pid, proc.stdout, proc.stderr)
+                        proc.pid, proc.stdout.decode('utf-8'), proc.stderr.decode('utf-8'))
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
