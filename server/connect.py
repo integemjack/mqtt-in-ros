@@ -150,7 +150,7 @@ class Resquest(BaseHTTPRequestHandler):
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
                 self.wfile.write(buf.encode())
 
-        if path != 'watch':
+        if path != '/watch':
             self.wfile.write(buf.encode())
 
     def do_POST(self):
