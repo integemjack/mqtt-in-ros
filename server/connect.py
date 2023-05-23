@@ -56,6 +56,7 @@ class Resquest(BaseHTTPRequestHandler):
                 cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
             buf = 'ok'
             pid = self.proc.pid
+            commands[self.proc.pid] = self.proc
 
         elif path == '/stop':
             try:
