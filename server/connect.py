@@ -87,7 +87,7 @@ class Resquest(BaseHTTPRequestHandler):
                 try:
                     command = params['command']
                     print(command)
-                    proc = await asyncio.create_subprocess_exec(*command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     # stdout = ""
                     # for line in iter(proc.stdout.readline, b''):
                     #     print(line.decode('utf-8'), end='')
