@@ -5,6 +5,7 @@ import os
 import urllib
 import uuid
 import signal
+import select
 
 host = ('', 80)
 pid = 0
@@ -111,16 +112,30 @@ class Resquest(BaseHTTPRequestHandler):
                     print(commands)
                     commandThis = commands[params['pid'][0]]
                     print(commandThis)
+                    # Set the timeout for reading subprocess output
+                    commandThis.stderr.settimeout(1)  # 设置超时时间为1秒
+                    # Set the timeout for reading subprocess output
+                    commandThis.stdout.settimeout(1)  # 设置超时时间为1秒
 
                     while True:
-                        # Read one line from the subprocess output
-                        output_line = commandThis.stderr.readline()
+
+
+                        # Read one line from the subprocess output with timeout
+                        ready = select.select([commandThis.stderr], [], [], 1)
+                        if ready[0]:
+                            output_line = commandThis.stdout.readline()
+                        else:
+                            output_line = b''  # 超时时返回空字符串
 
                         # Write the output line as the response
                         self.wfile.write(output_line)
 
-                        # Read one line from the subprocess output
-                        output_line = commandThis.stdout.readline()
+                        # Read one line from the subprocess output with timeout
+                        ready = select.select([commandThis.stdout], [], [], 1)
+                        if ready[0]:
+                            output_line = commandThis.stdout.readline()
+                        else:
+                            output_line = b''  # 超时时返回空字符串
 
                         # Write the output line as the response
                         self.wfile.write(output_line)
