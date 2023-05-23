@@ -118,12 +118,6 @@ class Resquest(BaseHTTPRequestHandler):
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
 
                     while True:
-                        # 检查子进程的状态
-                        returncode = commandThis.poll()
-                        if returncode is not None:
-                            # 子进程已经结束
-                            print("子进程已退出，退出码：", returncode)
-                            break
                         try:
                             # Read one line from the subprocess output with timeout
                             output_line = commandThis.stdout.readline().decode('utf-8')
@@ -142,6 +136,12 @@ class Resquest(BaseHTTPRequestHandler):
                         except subprocess.TimeoutExpired:
                             # Timeout occurred, continue the loop
                             pass
+                        # 检查子进程的状态
+                        returncode = commandThis.poll()
+                        if returncode is not None:
+                            # 子进程已经结束
+                            print("子进程已退出，退出码：", returncode)
+                            break
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
