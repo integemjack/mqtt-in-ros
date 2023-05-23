@@ -191,7 +191,15 @@ class Resquest(BaseHTTPRequestHandler):
                                 # Timeout occurred, break the inner loop
                                 break
 
+                            if self.wfile.closed:
+                                # Check if the connection is closed
+                                break
+
                         print('读取一次数据...%d...完成.' % i)
+
+                        if self.wfile.closed:
+                            # Check if the connection is closed
+                            break
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
