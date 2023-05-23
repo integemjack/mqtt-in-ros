@@ -184,7 +184,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                         except subprocess.TimeoutExpired:
                             # Timeout occurred, continue the loop
-                            pass
+                            time.sleep(0.1)
 
                     return
 
