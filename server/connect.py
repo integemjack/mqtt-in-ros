@@ -6,6 +6,7 @@ import urllib
 import uuid
 import signal
 import time
+import select
 
 host = ('', 80)
 pid = 0
@@ -149,10 +150,14 @@ class Resquest(BaseHTTPRequestHandler):
                     self.send_header("Content-type", "text/plain")
 
                     i = 0
+                    timeout = 5  # 设置超时时间为5秒
+
                     while True:
-                        i+=1
+                        i += 1
                         print('读取一次数据...%d' % i)
-                        try:
+                        start_time = time.time()
+                        
+                        while True:
                             # 检查子进程的状态
                             returncode = commandThis.poll()
                             if returncode is not None:
@@ -167,28 +172,24 @@ class Resquest(BaseHTTPRequestHandler):
                                 self.wfile.write(("exit(%d)" % returncode).encode())
                                 break
 
-                            print('读取一次数据...%d...完成（1）' % i)
                             # Read one line from the subprocess output with timeout
-                            output_line = commandThis.stdout.readline().decode('utf-8')
-                            if output_line:
-                                self.wfile.write(output_line.encode('utf-8'))
-                                self.wfile.flush()
-                            print('读取一次数据...%d...完成（2）' % i)
+                            ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
+                            if commandThis.stdout in ready[0]:
+                                output_line = commandThis.stdout.readline().decode('utf-8')
+                                if output_line:
+                                    self.wfile.write(output_line.encode('utf-8'))
+                                    self.wfile.flush()
 
-                            # Read one line from the subprocess error output with timeout
-                            error_line = commandThis.stderr.readline().decode('utf-8')
-                            if error_line:
-                                self.wfile.write(error_line.encode('utf-8'))
-                                self.wfile.flush()
-                            print('读取一次数据...%d...完成（3）' % i)
+                            if commandThis.stderr in ready[0]:
+                                error_line = commandThis.stderr.readline().decode('utf-8')
+                                if error_line:
+                                    self.wfile.write(error_line.encode('utf-8'))
+                                    self.wfile.flush()
 
-                            if not output_line and not error_line:
-                                # Both output and error streams are empty, sleep for a short while
-                                time.sleep(0.1)
-                            print('读取一次数据...%d...完成（4）' % i)
-                        except:
-                            # Timeout occurred, continue the loop
-                            time.sleep(0.1)
+                            elapsed_time = time.time() - start_time
+                            if elapsed_time >= timeout:
+                                # Timeout occurred, break the inner loop
+                                break
 
                         print('读取一次数据...%d...完成.' % i)
 
