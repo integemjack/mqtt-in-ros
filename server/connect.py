@@ -1,4 +1,5 @@
-from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 import subprocess
 import os
 import urllib
@@ -11,6 +12,10 @@ ip = '*'
 port = 0
 command = ""
 commands = {}
+
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 
 
 class Resquest(BaseHTTPRequestHandler):
@@ -163,6 +168,6 @@ def machineId():
 
 
 if __name__ == '__main__':
-    server = ThreadingHTTPServer(host, Resquest)
+    server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
     server.serve_forever()
