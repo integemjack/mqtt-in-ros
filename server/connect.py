@@ -87,7 +87,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/status':
             mqtt_connect = "false"
             returncode = commands["%d" % pid].poll()
-            if returncode is not None:
+            if returncode is None:
                 mqtt_connect = "true"
             buf = "{" + "\"success\": {}, \"mqtt_ip\": \"{}:{}\", \"device\": \"nano\"".format(
                 mqtt_connect, ip, port) + "}"
