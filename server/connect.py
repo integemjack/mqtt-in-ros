@@ -203,6 +203,8 @@ class Resquest(BaseHTTPRequestHandler):
                             # Check if the connection is closed
                             break
 
+                    return
+
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
                     self.wfile.write(buf.encode())
