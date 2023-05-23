@@ -114,6 +114,10 @@ class Resquest(BaseHTTPRequestHandler):
                     # Read one line from the subprocess output
                     output_line = commandThis.stdout.readline()
 
+                    # Write the output line as the response
+                    self.send_response(200)
+                    self.send_header("Content-type", "text/plain")
+                    self.end_headers()
                     self.wfile.write(output_line)
 
                 except Exception as e:
