@@ -183,7 +183,7 @@ class Resquest(BaseHTTPRequestHandler):
                             # Timeout occurred, continue the loop
                             pass
 
-                        return
+                    return
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
