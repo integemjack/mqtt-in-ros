@@ -89,37 +89,34 @@ class Resquest(BaseHTTPRequestHandler):
                     print(command)
                     proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
                                             preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    # stdout = ""
-                    # for line in iter(proc.stdout.readline, b''):
-                    #     print(line.decode('utf-8'), end='')
-                    #     self.wfile.write(line)
-                    #     stdout += line.decode('utf-8')
-                    # stderr = ""
-                    # for line in iter(proc.stdout.readline, b''):
-                    #     print(line.decode('utf-8'), end='')
-                    #     self.wfile.write(line)
-                    #     stderr += line.decode('utf-8')
-                    # # proc.communicate()
-                    # proc.wait()
 
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
                     commands.insert(proc.pid, proc)
 
-                    self.wfile.write(buf.encode())
-
-                    # Send output to the web page in real-time
-                    # for line in iter(proc.stdout.readline, b''):
-                    #     line = line.decode('utf-8')
-                    #     self.wfile.write(line.encode('utf-8'))
-                    #     self.wfile.flush()
-
-                    # proc.communicate()
-
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
+
+        elif path == '/watch':
+            if len(params['pid']) > 0:
+                try:
+                    commandThis = commands[params['pid'] * 1]
+
+                    # Read one line from the subprocess output
+                    output_line = commandThis.stdout.readline()
+
+                    # Decode the line from bytes to string (assuming it's text)
+                    decoded_line = output_line.decode("utf-8")
+
+                    # Display the line
+                    print(decoded_line)
+
+                except Exception as e:
+                    buf = "{\"suceesss\": false, \"error\": %s}" % e
+            else:
+                buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
 
         self.wfile.write(buf.encode())
 
