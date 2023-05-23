@@ -5,7 +5,7 @@ import os
 import urllib
 import uuid
 import signal
-import select
+import time
 
 host = ('', 80)
 pid = 0
@@ -58,6 +58,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
+            time.sleep(1)
             returncode = commands["%d" % pid].poll()
             if returncode is not None:
                 buf = "{\"suceesss\": false, \"pid\": %d}" % self.proc.pid
@@ -134,6 +135,7 @@ class Resquest(BaseHTTPRequestHandler):
                                 error_line = commandThis.stderr.read().decode('utf-8')
                                 if error_line:
                                     self.wfile.write(error_line.encode('utf-8'))
+                                self.wfile.write("\r\nexit(%d)" % returncode)
                                 break
                             # Read one line from the subprocess output with timeout
                             output_line = commandThis.stdout.readline().decode('utf-8')
