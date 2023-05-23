@@ -58,6 +58,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
+            returncode = commands["%d" % pid].poll()
             if returncode is not None:
                 buf = "{\"suceesss\": false, \"pid\": %d}" % self.proc.pid
 
