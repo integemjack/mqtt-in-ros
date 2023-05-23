@@ -166,22 +166,26 @@ class Resquest(BaseHTTPRequestHandler):
 
                                 self.wfile.write(("exit(%d)" % returncode).encode())
                                 break
+
+                            print('读取一次数据...%d...完成（1）' % i)
                             # Read one line from the subprocess output with timeout
                             output_line = commandThis.stdout.readline().decode('utf-8')
                             if output_line:
                                 self.wfile.write(output_line.encode('utf-8'))
                                 self.wfile.flush()
+                            print('读取一次数据...%d...完成（2）' % i)
 
                             # Read one line from the subprocess error output with timeout
                             error_line = commandThis.stderr.readline().decode('utf-8')
                             if error_line:
                                 self.wfile.write(error_line.encode('utf-8'))
                                 self.wfile.flush()
+                            print('读取一次数据...%d...完成（3）' % i)
 
                             if not output_line and not error_line:
                                 # Both output and error streams are empty, sleep for a short while
                                 time.sleep(0.1)
-
+                            print('读取一次数据...%d...完成（4）' % i)
                         except:
                             # Timeout occurred, continue the loop
                             time.sleep(0.1)
