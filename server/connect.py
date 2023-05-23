@@ -114,6 +114,12 @@ class Resquest(BaseHTTPRequestHandler):
 
                     while True:
                         # Read one line from the subprocess output
+                        output_line = commandThis.stderr.readline()
+
+                        # Write the output line as the response
+                        self.wfile.write(output_line)
+
+                        # Read one line from the subprocess output
                         output_line = commandThis.stdout.readline()
 
                         # Write the output line as the response
