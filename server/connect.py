@@ -88,7 +88,9 @@ class Resquest(BaseHTTPRequestHandler):
                     print(command)
                     self.proc = subprocess.Popen(
                         command, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
-                    buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
+                    self.proc.communicate()
+                    buf = "{\"suceesss\": true, \"pid\": %d, \"out\": \"%s\", \"error\": \"%s\"}" % (
+                        self.proc.pid, self.proc.stdout, self.proc.stderr)
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
