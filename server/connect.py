@@ -85,7 +85,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/command':
             if len(params['command']) > 0:
                 try:
-                    command = params['command']
+                    command = params['command'][0]
                     print(command)
                     proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
                                             preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
