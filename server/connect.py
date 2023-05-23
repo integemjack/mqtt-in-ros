@@ -10,6 +10,7 @@ pid = 0
 ip = '*'
 port = 0
 command = ""
+commands = []
 
 
 class Resquest(BaseHTTPRequestHandler):
@@ -90,12 +91,12 @@ class Resquest(BaseHTTPRequestHandler):
                         command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout = ""
                     for line in iter(proc.stdout.readline, b''):
-                        # print(line.decode('utf-8'), end='')
+                        print(line.decode('utf-8'), end='')
                         self.wfile.write(line)
                         stdout += line.decode('utf-8')
                     stderr = ""
                     for line in iter(proc.stdout.readline, b''):
-                        # print(line.decode('utf-8'), end='')
+                        print(line.decode('utf-8'), end='')
                         self.wfile.write(line)
                         stderr += line.decode('utf-8')
                     proc.communicate()
