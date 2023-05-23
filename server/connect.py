@@ -135,7 +135,7 @@ class Resquest(BaseHTTPRequestHandler):
                                 error_line = commandThis.stderr.read().decode('utf-8')
                                 if error_line:
                                     self.wfile.write(error_line.encode('utf-8'))
-                                self.wfile.write("\r\nexit(%d)" % returncode)
+                                self.wfile.write(("\r\nexit(%d)" % returncode).encode())
                                 break
                             # Read one line from the subprocess output with timeout
                             output_line = commandThis.stdout.readline().decode('utf-8')
