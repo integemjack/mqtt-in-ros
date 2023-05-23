@@ -145,10 +145,13 @@ class Resquest(BaseHTTPRequestHandler):
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
+                    self.wfile.write(buf.encode())
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
+                self.wfile.write(buf.encode())
 
-        self.wfile.write(buf.encode())
+        if path != 'watch':
+            self.wfile.write(buf.encode())
 
     def do_POST(self):
         # datas = self.rfile.read(int(self.headers['content-length']))
