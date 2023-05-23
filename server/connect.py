@@ -99,7 +99,8 @@ class Resquest(BaseHTTPRequestHandler):
                         print(line.decode('utf-8'), end='')
                         self.wfile.write(line)
                         stderr += line.decode('utf-8')
-                    proc.communicate()
+                    # proc.communicate()
+                    proc.wait()
                     buf = "{\"suceesss\": true, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (
                         proc.pid, stdout, stderr)
                 except Exception as e:
