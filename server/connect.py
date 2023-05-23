@@ -58,6 +58,8 @@ class Resquest(BaseHTTPRequestHandler):
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
+            if returncode is None:
+                buf = "{\"suceesss\": false, \"pid\": %d}" % self.proc.pid
 
         elif path == '/stop':
             try:
