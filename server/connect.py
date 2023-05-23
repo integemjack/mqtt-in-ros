@@ -114,9 +114,10 @@ class Resquest(BaseHTTPRequestHandler):
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
                     commands["%d" % proc.pid] = proc
+                    thisPid = proc.pid
                     time.sleep(1)
 
-                    commandThis = commands["%d" % proc.pid]
+                    commandThis = commands["%d" % thisPid]
                     # Set the timeout for reading subprocess output
                     commandThis.stdout.timeout = 1  # Set timeout to 1 second
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
@@ -127,7 +128,7 @@ class Resquest(BaseHTTPRequestHandler):
                         success = "true"
                         if error_line != "":
                             success = "false"
-                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, pid, output_line, error_line)
+                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, thisPid, output_line, error_line)
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
