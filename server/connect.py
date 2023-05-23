@@ -88,12 +88,12 @@ class Resquest(BaseHTTPRequestHandler):
                     print(command)
                     proc = subprocess.Popen(
                         command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    # for line in iter(proc.stdout.readline, b''):
-                    #     print(line.decode('utf-8'), end='')
-                    #     self.wfile.write(line)
+                    for line in iter(proc.stdout.readline, b''):
+                        print(line.decode('utf-8'), end='')
+                        self.wfile.write(line)
                     proc.communicate()
-                    buf = "{\"suceesss\": true, \"pid\": %d, \"out\": \"%s\", \"error\": \"%s\"}" % (
-                        proc.pid, proc.stdout.readline, proc.stderr.readline)
+                    buf = "{\"suceesss\": true, \"pid\": %d, \"error\": \"%s\"}" % (
+                        proc.pid, proc.stderr.read)
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
