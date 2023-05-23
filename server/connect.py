@@ -73,7 +73,7 @@ class Resquest(BaseHTTPRequestHandler):
                 success = "true"
                 if error_line != "":
                     success = "false"
-                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, pid, output_line, error_line)
+                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, pid, output_line, error_line)
                 pid = 0
 
         elif path == '/stop':
@@ -132,7 +132,7 @@ class Resquest(BaseHTTPRequestHandler):
                         success = "true"
                         if error_line != "":
                             success = "false"
-                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, thisPid, output_line, error_line)
+                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
@@ -181,6 +181,8 @@ class Resquest(BaseHTTPRequestHandler):
                             # Timeout occurred, continue the loop
                             pass
 
+                        return
+
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
                     self.wfile.write(buf.encode())
@@ -188,8 +190,7 @@ class Resquest(BaseHTTPRequestHandler):
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
                 self.wfile.write(buf.encode())
 
-        if path != '/watch':
-            self.wfile.write(buf.encode())
+        self.wfile.write(buf.encode())
 
     def do_POST(self):
         # datas = self.rfile.read(int(self.headers['content-length']))
