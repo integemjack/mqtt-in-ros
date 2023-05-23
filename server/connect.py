@@ -93,7 +93,7 @@ class Resquest(BaseHTTPRequestHandler):
                     #     self.wfile.write(line)
                     proc.communicate()
                     buf = "{\"suceesss\": true, \"pid\": %d, \"out\": \"%s\", \"error\": \"%s\"}" % (
-                        proc.pid, proc.stdout.read, proc.stderr.read)
+                        proc.pid, proc.stdout.readline, proc.stderr.readline)
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
