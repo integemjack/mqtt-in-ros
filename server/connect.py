@@ -104,16 +104,17 @@ class Resquest(BaseHTTPRequestHandler):
 
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
+                    commands[proc.pid] = proc
 
                     self.wfile.write(buf.encode())
 
                     # Send output to the web page in real-time
-                    for line in iter(proc.stdout.readline, b''):
-                        line = line.decode('utf-8')
-                        self.wfile.write(line.encode('utf-8'))
-                        self.wfile.flush()
+                    # for line in iter(proc.stdout.readline, b''):
+                    #     line = line.decode('utf-8')
+                    #     self.wfile.write(line.encode('utf-8'))
+                    #     self.wfile.flush()
 
-                    proc.communicate()
+                    # proc.communicate()
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
