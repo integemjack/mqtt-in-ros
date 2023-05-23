@@ -85,8 +85,8 @@ class Resquest(BaseHTTPRequestHandler):
             mqtt_connect = "false"
             if pid != 0:
                 mqtt_connect = "true"
-            buf = "{\"success\": {}, \"mqtt_ip\": \"{}:{}\", \"device\": \"nano\"}".format(
-                mqtt_connect, ip, port)
+            buf = "{" + "\"success\": {}, \"mqtt_ip\": \"{}:{}\", \"device\": \"nano\"".format(
+                mqtt_connect, ip, port) + "}"
 
         elif path == '/command':
             if len(params['command']) > 0:
