@@ -48,7 +48,7 @@ class Resquest(BaseHTTPRequestHandler):
             if len(params['mqtt_ip']) > 0:
                 ips = params['mqtt_ip'][0].split(':', 1)
                 ip = ips[0]
-                port = ips[1]
+                port = ips[1] * 1
             cmd = "sed -i \"s/host: localhost/host: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && sed -i \"s/port: 1883/port: {}/g\" /home/nvidia/mqtt_ws/src/mqtt/config/demo_params.yaml && chmod +x -R /home/nvidia/mqtt_ws && cd /home/nvidia/mqtt_ws/devel && source setup.bash && roslaunch mqtt_bridge demo.launch".format(
                 ip, port)
             print("Command: ", cmd)
@@ -56,7 +56,7 @@ class Resquest(BaseHTTPRequestHandler):
                 cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
-            commands[self.proc.pid] = self.proc
+            commands["%d" % self.proc.pid] = self.proc
 
         elif path == '/stop':
             try:
