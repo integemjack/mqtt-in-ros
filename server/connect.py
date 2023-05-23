@@ -114,11 +114,7 @@ class Resquest(BaseHTTPRequestHandler):
                     # Read one line from the subprocess output
                     output_line = commandThis.stdout.readline()
 
-                    # Decode the line from bytes to string (assuming it's text)
-                    decoded_line = output_line.decode("utf-8")
-
-                    # Display the line
-                    print(decoded_line)
+                    self.wfile.write(output_line)
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
