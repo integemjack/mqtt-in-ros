@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import subprocess
 import os
 import urllib
@@ -163,6 +163,6 @@ def machineId():
 
 
 if __name__ == '__main__':
-    server = HTTPServer(host, Resquest)
+    server = ThreadingHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
     server.serve_forever()
