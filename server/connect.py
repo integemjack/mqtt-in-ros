@@ -85,7 +85,7 @@ class Resquest(BaseHTTPRequestHandler):
                 print(params['pid'])
                 if len(params['pid']) > 0:
                     print("pid", params['pid'])
-                    os.killpg(params['pid'][0] * 1, signal.SIGTERM)
+                    os.killpg(int(params['pid'][0]), signal.SIGTERM)
                     print("stoped!")
                     buf = '{"suceess": true, "pid": %d}' % params['pid']
                 elif pid != 0:
