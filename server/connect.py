@@ -180,7 +180,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                             if not output_line and not error_line:
                                 # Both output and error streams are empty, sleep for a short while
-                                pass
+                                time.sleep(0.1)
 
                         except subprocess.TimeoutExpired:
                             # Timeout occurred, continue the loop
