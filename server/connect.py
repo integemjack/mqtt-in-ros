@@ -103,6 +103,7 @@ class Resquest(BaseHTTPRequestHandler):
             if len(params['pid']) > 0:
                 try:
                     commandThis = commands[params['pid'][0] * 1]
+                    print(commandThis)
 
                     # Read one line from the subprocess output
                     output_line = commandThis.stdout.readline()
