@@ -155,22 +155,24 @@ class Resquest(BaseHTTPRequestHandler):
                     while True:
                         i += 1
                         print('读取一次数据...%d' % i)
+
+                        # 检查子进程的状态
+                        returncode = commandThis.poll()
+                        if returncode is not None:
+                            output_line = commandThis.stdout.read().decode('utf-8')
+                            if output_line:
+                                self.wfile.write(output_line.encode('utf-8'))
+
+                            error_line = commandThis.stderr.read().decode('utf-8')
+                            if error_line:
+                                self.wfile.write(error_line.encode('utf-8'))
+
+                            self.wfile.write(("exit(%d)" % returncode).encode())
+                            break
+
                         start_time = time.time()
                         
                         while True:
-                            # 检查子进程的状态
-                            returncode = commandThis.poll()
-                            if returncode is not None:
-                                output_line = commandThis.stdout.read().decode('utf-8')
-                                if output_line:
-                                    self.wfile.write(output_line.encode('utf-8'))
-
-                                error_line = commandThis.stderr.read().decode('utf-8')
-                                if error_line:
-                                    self.wfile.write(error_line.encode('utf-8'))
-
-                                self.wfile.write(("exit(%d)" % returncode).encode())
-                                break
 
                             # Read one line from the subprocess output with timeout
                             ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
