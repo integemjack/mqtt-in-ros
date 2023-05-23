@@ -67,7 +67,10 @@ class Resquest(BaseHTTPRequestHandler):
             if returncode is not None:
                 output_line = commandThis.stdout.read().decode('utf-8')
                 error_line = commandThis.stderr.read().decode('utf-8')
-                buf = "{\"suceesss\": false, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (pid, output_line, error_line)
+                success = "true"
+                if error_line != "":
+                    success = "false"
+                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, pid, output_line, error_line)
 
         elif path == '/stop':
             try:
@@ -121,7 +124,10 @@ class Resquest(BaseHTTPRequestHandler):
                     if returncode is not None:
                         output_line = commandThis.stdout.read().decode('utf-8')
                         error_line = commandThis.stderr.read().decode('utf-8')
-                        buf = "{\"suceesss\": false, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (pid, output_line, error_line)
+                        success = "true"
+                        if error_line != "":
+                            success = "false"
+                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (success, pid, output_line, error_line)
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
