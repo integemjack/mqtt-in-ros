@@ -167,11 +167,13 @@ class Resquest(BaseHTTPRequestHandler):
                             output_line = commandThis.stdout.readline().decode('utf-8')
                             if output_line:
                                 self.wfile.write(output_line.encode('utf-8'))
+                                self.wfile.flush()
 
                             # Read one line from the subprocess error output with timeout
                             error_line = commandThis.stderr.readline().decode('utf-8')
                             if error_line:
                                 self.wfile.write(error_line.encode('utf-8'))
+                                self.wfile.flush()
 
                             if not output_line and not error_line:
                                 # Both output and error streams are empty, sleep for a short while
