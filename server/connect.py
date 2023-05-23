@@ -148,7 +148,10 @@ class Resquest(BaseHTTPRequestHandler):
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
                     self.send_header("Content-type", "text/plain")
 
+                    i = 0
                     while True:
+                        i+=1
+                        print('读取一次数据...%d' % i)
                         try:
                             # 检查子进程的状态
                             returncode = commandThis.poll()
