@@ -87,7 +87,8 @@ class Resquest(BaseHTTPRequestHandler):
                 try:
                     command = params['command']
                     print(command)
-                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash", preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
+                                            preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     # stdout = ""
                     # for line in iter(proc.stdout.readline, b''):
                     #     print(line.decode('utf-8'), end='')
@@ -103,21 +104,16 @@ class Resquest(BaseHTTPRequestHandler):
 
                     buf = "{\"suceesss\": true, \"pid\": %d}" % (
                         proc.pid)
-                    
-                    self.wfile.write(buf.encode())
-                    
-                     # 逐行读取子进程的输出并发送到响应流
-                    while True:
-                        for line in iter(proc.stdout.readline, b''):
-                            line = line.decode('utf-8')
-                            print(line, end='')
-                            self.wfile.write(line.encode('utf-8'))
-                            self.wfile.flush()
-                        if not proc.poll() is None:
-                            break
 
-                    # 等待子进程完成
-                    # proc.communicate()
+                    self.wfile.write(buf.encode())
+
+                    # Send output to the web page in real-time
+                    for line in iter(proc.stdout.readline, b''):
+                        line = line.decode('utf-8')
+                        self.wfile.write(line.encode('utf-8'))
+                        self.wfile.flush()
+
+                    proc.communicate()
 
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
