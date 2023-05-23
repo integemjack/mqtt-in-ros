@@ -86,11 +86,11 @@ class Resquest(BaseHTTPRequestHandler):
                 try:
                     command = params['command']
                     print(command)
-                    self.proc = subprocess.Popen(
+                    proc = subprocess.Popen(
                         command, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
-                    self.proc.communicate()
+                    proc.communicate()
                     buf = "{\"suceesss\": true, \"pid\": %d, \"out\": \"%s\", \"error\": \"%s\"}" % (
-                        self.proc.pid, self.proc.stdout, self.proc.stderr)
+                        proc.pid, proc.stdout, proc.stderr)
                 except Exception as e:
                     buf = "{\"suceesss\": false, \"error\": %s}" % e
             else:
