@@ -87,7 +87,7 @@ class Resquest(BaseHTTPRequestHandler):
                     print("pid", params['pid'])
                     os.killpg(int(params['pid'][0]), signal.SIGTERM)
                     print("stoped!")
-                    buf = '{"suceess": true, "pid": %d}' % params['pid']
+                    buf = '{"suceess": true, "pid": %s}' % params['pid'][0]
                 elif pid != 0:
                     print("pid", pid)
                     os.killpg(pid, signal.SIGTERM)
