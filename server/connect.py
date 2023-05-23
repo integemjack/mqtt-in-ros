@@ -32,7 +32,7 @@ class Resquest(BaseHTTPRequestHandler):
         print(params)
 
         topic = params['machineid'][0]
-        global pid, ip, port, command
+        global pid, ip, port, command, commands
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -102,6 +102,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/watch':
             if len(params['pid']) > 0:
                 try:
+                    print(commands)
                     commandThis = commands[params['pid'][0] * 1]
                     print(commandThis)
 
