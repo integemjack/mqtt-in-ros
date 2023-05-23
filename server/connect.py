@@ -25,7 +25,7 @@ class Resquest(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "text/plain")
         self.end_headers()
 
         paths = self.path.split('?', 1)
