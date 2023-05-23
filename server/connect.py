@@ -59,9 +59,15 @@ class Resquest(BaseHTTPRequestHandler):
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
             time.sleep(1)
-            returncode = commands["%d" % pid].poll()
+            commandThis = commands["%d" % pid]
+            # Set the timeout for reading subprocess output
+            commandThis.stdout.timeout = 1  # Set timeout to 1 second
+            commandThis.stderr.timeout = 1  # Set timeout to 1 second
+            returncode = commandThis.poll()
             if returncode is not None:
-                buf = "{\"suceesss\": false, \"pid\": %d}" % self.proc.pid
+                output_line = commandThis.stdout.read().decode('utf-8')
+                error_line = commandThis.stderr.read().decode('utf-8')
+                buf = "{\"suceesss\": false, \"pid\": %d, \"stdout\": \"%s\", \"stderr\": \"%s\"}" % (pid, output_line, error_line)
 
         elif path == '/stop':
             try:
@@ -114,27 +120,25 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/watch':
             if len(params['pid']) > 0:
                 try:
-                    print(commands)
                     commandThis = commands[params['pid'][0]]
-                    print(commandThis)
                     # Set the timeout for reading subprocess output
                     commandThis.stdout.timeout = 1  # Set timeout to 1 second
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
                     self.send_header("Content-type", "text/plain")
+
                     while True:
-                        
                         try:
                             # 检查子进程的状态
                             returncode = commandThis.poll()
                             if returncode is not None:
-                                # 子进程已经结束
-                                print("子进程已退出，退出码：", returncode)
                                 output_line = commandThis.stdout.read().decode('utf-8')
                                 if output_line:
                                     self.wfile.write(output_line.encode('utf-8'))
+
                                 error_line = commandThis.stderr.read().decode('utf-8')
                                 if error_line:
                                     self.wfile.write(error_line.encode('utf-8'))
+
                                 self.wfile.write(("exit(%d)" % returncode).encode())
                                 break
                             # Read one line from the subprocess output with timeout
