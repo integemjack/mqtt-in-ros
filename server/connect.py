@@ -108,10 +108,9 @@ class Resquest(BaseHTTPRequestHandler):
                     
                      # 逐行读取子进程的输出并发送到响应流
                     while True:
-                        line = proc.stdout.readline
-                        if not line:
-                            break
-                        self.wfile.write(line)
+                        for line in iter(proc.stdout.readline, b''):
+                            print(line.decode('utf-8'), end='')
+                            self.wfile.write(line)
                         proc.drain()
 
                 except Exception as e:
