@@ -154,11 +154,6 @@ class Resquest(BaseHTTPRequestHandler):
                     timeout = 3  # 设置超时时间为5秒
 
                     while True:
-                        if self.wfile.closed:
-                            print('网页关闭.')
-                            # Check if the connection is closed
-                            break
-
                         i += 1
                         print('读取%d次数据...' % i)
 
@@ -176,39 +171,42 @@ class Resquest(BaseHTTPRequestHandler):
                             self.wfile.write(("exit(%d)" % returncode).encode())
                             break
 
-                        # start_time = time.time()
+                        start_time = time.time()
                         
-                        # while True:
-                        #     if self.wfile.closed:
-                        #         print('网页关闭.')
-                        #         # Check if the connection is closed
-                        #         break
+                        while True:
+                            if self.wfile.closed:
+                                print('网页关闭.')
+                                # Check if the connection is closed
+                                break
 
-                        # Read one line from the subprocess output with timeout
-                        ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
-                        if commandThis.stdout in ready[0]:
-                            print('读取%d次数据...stdout.' % i)
-                            output_line = commandThis.stdout.readline().decode('utf-8')
-                            if output_line:
-                                self.wfile.write(output_line.encode('utf-8'))
-                                self.wfile.flush()
+                            # Read one line from the subprocess output with timeout
+                            ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
+                            if commandThis.stdout in ready[0]:
+                                print('读取%d次数据...stdout.' % i)
+                                output_line = commandThis.stdout.readline().decode('utf-8')
+                                if output_line:
+                                    self.wfile.write(output_line.encode('utf-8'))
+                                    self.wfile.flush()
 
-                        if commandThis.stderr in ready[0]:
-                            print('读取%d次数据...stderr.' % i)
-                            error_line = commandThis.stderr.readline().decode('utf-8')
-                            if error_line:
-                                self.wfile.write(error_line.encode('utf-8'))
-                                self.wfile.flush()
+                            if commandThis.stderr in ready[0]:
+                                print('读取%d次数据...stderr.' % i)
+                                error_line = commandThis.stderr.readline().decode('utf-8')
+                                if error_line:
+                                    self.wfile.write(error_line.encode('utf-8'))
+                                    self.wfile.flush()
 
-                            # elapsed_time = time.time() - start_time
-                            # if elapsed_time >= timeout:
-                            #     print('读取%d次数据...失败.' % i)
-                            #     # Timeout occurred, break the inner loop
-                            #     break
+                            elapsed_time = time.time() - start_time
+                            if elapsed_time >= timeout:
+                                print('读取%d次数据...失败.' % i)
+                                # Timeout occurred, break the inner loop
+                                break
 
                         print('读取%d次数据...完成.' % i)
 
-
+                        if self.wfile.closed:
+                            print('网页关闭.')
+                            # Check if the connection is closed
+                            break
 
                     return
 
