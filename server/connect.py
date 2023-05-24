@@ -257,7 +257,7 @@ class Resquest(BaseHTTPRequestHandler):
             elif isinstance(value, bytes):
                 value = value.decode("utf-8")
             elif isinstance(value, list):
-                value = [(item.encode("utf-8") if isinstance(item, str) else item.decode("utf-8")) for item in value]
+                value = [(item.encode("utf-8") if isinstance(item, str) else item.decode("utf-8")) for item in value][0]
             elif isinstance(value, dict):
                 value = {(k if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8") if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
             if isinstance(key, str):
@@ -270,7 +270,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.end_headers()
 
         print(postvars_utf8)
-        topic = postvars_utf8['machineid'][0]
+        topic = postvars_utf8['machineid']
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -283,9 +283,9 @@ class Resquest(BaseHTTPRequestHandler):
         path = paths[0]
 
         if path == '/command':
-            if postvars_utf8['command'] and postvars_utf8['command'][0] != '':
+            if postvars_utf8['command'] and postvars_utf8['command'] != '':
                 try:
-                    command = postvars_utf8['command'][0]
+                    command = postvars_utf8['command']
                     print(command)
                     proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
                                             preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
