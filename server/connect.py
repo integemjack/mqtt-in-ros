@@ -149,6 +149,8 @@ class Resquest(BaseHTTPRequestHandler):
 
                     if logs[params['pid'][0]]:
                         self.wfile.write(logs[params['pid'][0]])
+                    else:
+                        logs[params['pid'][0]] = b''
 
                     commandThis = commands[params['pid'][0]]
                     # Set the timeout for reading subprocess output
