@@ -174,6 +174,7 @@ class Resquest(BaseHTTPRequestHandler):
                         start_time = time.time()
                         
                         while True:
+                            print(self.wfile.closed)
                             if self.wfile.closed:
                                 print('网页关闭.')
                                 # Check if the connection is closed
@@ -203,6 +204,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                         print('读取%d次数据...完成.' % i)
 
+                        print(self.wfile.closed)
                         if self.wfile.closed:
                             print('网页关闭.')
                             # Check if the connection is closed
