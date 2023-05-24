@@ -177,7 +177,7 @@ class Resquest(BaseHTTPRequestHandler):
                         # 检查子进程的状态
                         returncode = commandThis.poll()
                         if returncode is not None:
-                            logs[params['pid'][0]] = ''
+                            logs[params['pid'][0]] = b''
                             output_line = commandThis.stdout.read()#.decode('utf-8')
                             if output_line:
                                 self.wfile.write(output_line) #.encode('utf-8')
