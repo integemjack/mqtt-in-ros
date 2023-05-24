@@ -261,9 +261,9 @@ class Resquest(BaseHTTPRequestHandler):
             elif isinstance(value, dict):
                 value = {(k.encode("utf-8") if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8") if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
             if isinstance(key, str):
-                postvars_utf8[key] = value
-            else:
                 postvars_utf8[key.encode("utf-8")] = value
+            else:
+                postvars_utf8[key.decode("utf-8")] = value
 
         self.send_response(200)
         self.send_header("Content-type", "text/json")
