@@ -231,6 +231,7 @@ class Resquest(BaseHTTPRequestHandler):
 
     def do_POST(self):
         global pid, ip, port, command, commands, logs
+
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         if ctype == 'multipart/form-data':
             # Ensure that boundary is bytes, not str
@@ -251,12 +252,17 @@ class Resquest(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/json")
         self.end_headers()
 
+        topic = postvars['machineid']
+
+        buf = 'no function'
+        print('machineId: "', machineId(), '"  topic: ', topic)
+        if machineId() != topic:
+            return self.wfile.write('No this device!'.encode())
+
         # print(postvars)
         paths = self.path.split('?', 1)
         print(paths)
         path = paths[0]
-
-        buf = 'No DATA!'
 
         if path == '/command':
             if postvars['command'] and postvars['command'] != '':
