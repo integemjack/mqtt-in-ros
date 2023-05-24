@@ -151,7 +151,7 @@ class Resquest(BaseHTTPRequestHandler):
                     self.send_header("Content-type", "text/plain")
 
                     i = 0
-                    timeout = 1  # 设置超时时间为5秒
+                    timeout = 3  # 设置超时时间为5秒
 
                     while True:
                         i += 1
@@ -178,7 +178,7 @@ class Resquest(BaseHTTPRequestHandler):
                                 print('网页关闭.')
                                 # Check if the connection is closed
                                 break
-                            
+
                             # Read one line from the subprocess output with timeout
                             ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
                             if commandThis.stdout in ready[0]:
