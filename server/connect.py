@@ -252,6 +252,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/json")
         self.end_headers()
 
+        print(postvars)
         topic = postvars['machineid']
 
         buf = 'no function'
