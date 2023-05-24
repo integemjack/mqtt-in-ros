@@ -178,13 +178,13 @@ class Resquest(BaseHTTPRequestHandler):
                             # Read one line from the subprocess output with timeout
                             ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
                             if commandThis.stdout in ready[0]:
-                                output_line = commandThis.stdout.readline().decode('utf-8')
+                                output_line = commandThis.stdout.read().decode('utf-8')
                                 if output_line:
                                     self.wfile.write(output_line.encode('utf-8'))
                                     self.wfile.flush()
 
                             if commandThis.stderr in ready[0]:
-                                error_line = commandThis.stderr.readline().decode('utf-8')
+                                error_line = commandThis.stderr.read().decode('utf-8')
                                 if error_line:
                                     self.wfile.write(error_line.encode('utf-8'))
                                     self.wfile.flush()
