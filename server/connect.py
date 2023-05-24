@@ -259,9 +259,9 @@ class Resquest(BaseHTTPRequestHandler):
             elif isinstance(value, list):
                 value = [(item.encode("utf-8") if isinstance(item, str) else item.decode("utf-8")) for item in value]
             elif isinstance(value, dict):
-                value = {(k.encode("utf-8") if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8") if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
+                value = {(k if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8") if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
             if isinstance(key, str):
-                postvars_utf8[key.encode("utf-8")] = value
+                postvars_utf8[key] = value
             else:
                 postvars_utf8[key.decode("utf-8")] = value
 
