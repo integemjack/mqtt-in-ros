@@ -253,7 +253,7 @@ class Resquest(BaseHTTPRequestHandler):
 
         for key, value in postvars.items():
             if isinstance(value, str):
-                value = value.encode("utf-8")
+                value = value
             elif isinstance(value, bytes):
                 value = value.decode("utf-8")
             elif isinstance(value, list):
