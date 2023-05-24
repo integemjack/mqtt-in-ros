@@ -233,6 +233,7 @@ class Resquest(BaseHTTPRequestHandler):
         global pid, ip, port, command, commands, logs
 
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
+        print(ctype)
         if ctype == 'multipart/form-data':
             # Ensure that boundary is bytes, not str
             pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
