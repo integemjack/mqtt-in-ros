@@ -217,6 +217,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                 except Exception as e:
                     print('结束循环.')
+                    print(e)
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
