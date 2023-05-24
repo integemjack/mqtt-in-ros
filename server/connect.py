@@ -249,12 +249,23 @@ class Resquest(BaseHTTPRequestHandler):
             postvars = {}
         # now you can use postvars
 
+        postvars_utf8 = {}
+
+        for key, value in postvars.items():
+            if isinstance(value, str):
+                value = value.encode("utf-8")
+            elif isinstance(value, list):
+                value = [item.encode("utf-8") for item in value]
+            elif isinstance(value, dict):
+                value = {k: v.encode("utf-8") for k, v in value.items()}
+            postvars_utf8[key] = value
+
         self.send_response(200)
         self.send_header("Content-type", "text/json")
         self.end_headers()
 
-        print(postvars)
-        topic = postvars['machineid']
+        print(postvars_utf8)
+        topic = postvars_utf8['machineid']
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -267,9 +278,9 @@ class Resquest(BaseHTTPRequestHandler):
         path = paths[0]
 
         if path == '/command':
-            if postvars['command'] and postvars['command'] != '':
+            if postvars_utf8['command'] and postvars_utf8['command'] != '':
                 try:
-                    command = postvars['command']
+                    command = postvars_utf8['command']
                     print(command)
                     proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
                                             preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
