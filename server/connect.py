@@ -146,7 +146,7 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/watch':
             if len(params['pid']) > 0:
                 try:
-
+                    print(logs[params['pid'][0]])
                     if logs[params['pid'][0]]:
                         self.wfile.write(logs[params['pid'][0]])
                     else:
