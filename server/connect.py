@@ -230,6 +230,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.wfile.write(buf.encode())
 
     def do_POST(self):
+        global pid, ip, port, command, commands, logs
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         if ctype == 'multipart/form-data':
             # Ensure that boundary is bytes, not str
@@ -246,15 +247,51 @@ class Resquest(BaseHTTPRequestHandler):
             postvars = {}
         # now you can use postvars
 
-        print(postvars)
-        print(self.path)
-
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "text/json")
         self.end_headers()
 
-        html = '''No Data!!!'''
-        self.wfile.write(html.encode())
+        # print(postvars)
+        paths = self.path.split('?', 1)
+        print(paths)
+        path = paths[0]
+
+        buf = 'No DATA!'
+
+        if path == '/command':
+            if postvars['command'] and postvars['command'] != '':
+                try:
+                    command = postvars['command']
+                    print(command)
+                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
+                                            preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                    buf = "{\"suceesss\": true, \"pid\": %d}" % (
+                        proc.pid)
+                    commands["%d" % proc.pid] = proc
+                    thisPid = proc.pid
+                    logs["%d" % thisPid] = b''
+                    time.sleep(1)
+
+                    commandThis = commands["%d" % thisPid]
+                    # Set the timeout for reading subprocess output
+                    commandThis.stdout.timeout = 1  # Set timeout to 1 second
+                    commandThis.stderr.timeout = 1  # Set timeout to 1 second
+                    returncode = commandThis.poll()
+                    if returncode is not None:
+                        output_line = commandThis.stdout.read().decode('utf-8')
+                        error_line = commandThis.stderr.read().decode('utf-8')
+                        success = "true"
+                        if error_line != "":
+                            success = "false"
+                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
+
+                except Exception as e:
+                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
+            else:
+                buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
+
+        self.wfile.write(buf.encode())
 
 
 def readFile(file):
