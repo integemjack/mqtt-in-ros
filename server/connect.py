@@ -7,6 +7,7 @@ import uuid
 import signal
 import time
 import select
+import fcntl
 
 host = ('', 80)
 pid = 0
@@ -150,8 +151,18 @@ class Resquest(BaseHTTPRequestHandler):
                     commandThis.stderr.timeout = 1  # Set timeout to 1 second
                     self.send_header("Content-type", "text/plain")
 
+                    # Get the current stdout flags
+                    flags = fcntl.fcntl(commandThis.stdout, fcntl.F_GETFL)
+                    # Set the stdout to non-blocking
+                    fcntl.fcntl(commandThis.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
+                    # Get the current stdout flags
+                    flagse = fcntl.fcntl(commandThis.stderr, fcntl.F_GETFL)
+                    # Set the stdout to non-blocking
+                    fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL, flagse | os.O_NONBLOCK)
+
                     i = 0
-                    timeout = 3  # 设置超时时间为5秒
+                    # timeout = 3  # 设置超时时间为5秒
 
                     while True:
                         i += 1
@@ -171,36 +182,36 @@ class Resquest(BaseHTTPRequestHandler):
                             self.wfile.write(("exit(%d)" % returncode).encode())
                             break
 
-                        start_time = time.time()
+                        # start_time = time.time()
                         
-                        while True:
-                            print(self.wfile.closed)
-                            if self.wfile.closed:
-                                print('网页关闭.')
-                                # Check if the connection is closed
-                                break
+                        # while True:
+                        #     print(self.wfile.closed)
+                        #     if self.wfile.closed:
+                        #         print('网页关闭.')
+                        #         # Check if the connection is closed
+                        #         break
 
                             # Read one line from the subprocess output with timeout
                             # ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
                             # if commandThis.stdout in ready[0]:
-                            print('读取%d次数据...stdout.' % i)
-                            output_line = commandThis.stdout.read().decode('utf-8')
-                            if output_line:
-                                self.wfile.write(output_line.encode('utf-8'))
-                                self.wfile.flush()
+                        print('读取%d次数据...stdout.' % i)
+                        output_line = commandThis.stdout.read().decode('utf-8')
+                        if output_line:
+                            self.wfile.write(output_line.encode('utf-8'))
+                            self.wfile.flush()
 
                             # if commandThis.stderr in ready[0]:
-                            print('读取%d次数据...stderr.' % i)
-                            error_line = commandThis.stderr.read().decode('utf-8')
-                            if error_line:
-                                self.wfile.write(error_line.encode('utf-8'))
-                                self.wfile.flush()
+                        print('读取%d次数据...stderr.' % i)
+                        error_line = commandThis.stderr.read().decode('utf-8')
+                        if error_line:
+                            self.wfile.write(error_line.encode('utf-8'))
+                            self.wfile.flush()
 
-                            elapsed_time = time.time() - start_time
-                            if elapsed_time >= timeout:
-                                print('读取%d次数据...失败.' % i)
-                                # Timeout occurred, break the inner loop
-                                break
+                            # elapsed_time = time.time() - start_time
+                            # if elapsed_time >= timeout:
+                            #     print('读取%d次数据...失败.' % i)
+                            #     # Timeout occurred, break the inner loop
+                            #     break
 
                         print('读取%d次数据...完成.' % i)
 
