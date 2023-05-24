@@ -174,7 +174,11 @@ class Resquest(BaseHTTPRequestHandler):
                         start_time = time.time()
                         
                         while True:
-
+                            if self.wfile.closed:
+                                print('网页关闭.')
+                                # Check if the connection is closed
+                                break
+                            
                             # Read one line from the subprocess output with timeout
                             ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
                             if commandThis.stdout in ready[0]:
@@ -195,11 +199,6 @@ class Resquest(BaseHTTPRequestHandler):
                             if elapsed_time >= timeout:
                                 print('读取%d次数据...失败.' % i)
                                 # Timeout occurred, break the inner loop
-                                break
-
-                            if self.wfile.closed:
-                                print('网页关闭.')
-                                # Check if the connection is closed
                                 break
 
                         print('读取%d次数据...完成.' % i)
