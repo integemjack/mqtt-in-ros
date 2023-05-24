@@ -172,11 +172,11 @@ class Resquest(BaseHTTPRequestHandler):
                         if returncode is not None:
                             output_line = commandThis.stdout.read()#.decode('utf-8')
                             if output_line:
-                                self.wfile.write(output_line.encode('utf-8'))
+                                self.wfile.write(output_line) #.encode('utf-8')
 
                             error_line = commandThis.stderr.read()#.decode('utf-8')
                             if error_line:
-                                self.wfile.write(error_line.encode('utf-8'))
+                                self.wfile.write(error_line) #.encode('utf-8')
 
                             self.wfile.write(("exit(%d)" % returncode).encode())
                             break
