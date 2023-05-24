@@ -216,10 +216,8 @@ class Resquest(BaseHTTPRequestHandler):
                 except Exception as e:
                     print('结束循环.')
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
-                    self.wfile.write(buf.encode())
             else:
                 buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
-                self.wfile.write(buf.encode())
 
         self.wfile.write(buf.encode())
 
