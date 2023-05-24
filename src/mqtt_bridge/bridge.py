@@ -15,6 +15,7 @@ from .util import lookup_object, extract_values, populate_instance
 
 pid = []
 
+
 def f():
     global pid
     if len(pid) > 0:
@@ -27,6 +28,7 @@ def f():
 
 
 atexit.register(f)
+
 
 def create_bridge(factory: Union[str, "Bridge"], msg_type: Union[str, Type[rospy.Message]], topic_from: str,
                   topic_to: str, frequency: Optional[float] = None, **kwargs) -> "Bridge":
@@ -84,10 +86,12 @@ class RosToMqttBridge(Bridge):
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(msg.detections)
         if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
-            payload = ",".join(['%s' % (d.id[0]) for d in msg.detections]) #self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+            # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+            payload = ",".join(['%s' % (d.id[0]) for d in msg.detections])
 #             payload = "[{}]".format(payload)
         elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
-            payload = ",".join(['%s:%.2f' % (d.Class, d.probability) for d in msg.bounding_boxes])
+            payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
+                               for d in msg.bounding_boxes])
         else:
             payload = yaml.dump(msg)
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
@@ -129,11 +133,21 @@ class MqttToRosBridge(Bridge):
 
             if msg[0] == 'start':
                 cmd = []
+                msgs = []
+
+                for item in msg:
+                    split_item = item.split('=')
+                    if len(split_item) > 1:
+                        msgs.append(split_item)
+
                 if msg[1] == 'detectnet':
-                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
-                        msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480)]
+                    # cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
+                    #     msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480) + ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
+                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch" +
+                           ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                 elif msg[1] == 'apriltag':
-                    cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5", "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
+                    cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5",
+                           "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
                 rospy.loginfo(cmd)
                 # , preexec_fn=os.setsid)
                 if len(cmd) > 0:
@@ -176,7 +190,6 @@ class MqttToRosBridge(Bridge):
                         rospy.logerr(e)
         except Exception as e:
             rospy.logerr(e)
-
 
     def _create_ros_message(self, mqtt_msg: mqtt.MQTTMessage) -> rospy.Message:
         """ create ROS message from MQTT payload """

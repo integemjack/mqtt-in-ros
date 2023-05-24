@@ -151,7 +151,7 @@ class Resquest(BaseHTTPRequestHandler):
                     self.send_header("Content-type", "text/plain")
 
                     i = 0
-                    timeout = 5  # 设置超时时间为5秒
+                    timeout = 1  # 设置超时时间为5秒
 
                     while True:
                         i += 1
