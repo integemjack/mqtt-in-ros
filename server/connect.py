@@ -171,11 +171,11 @@ class Resquest(BaseHTTPRequestHandler):
                         # 检查子进程的状态
                         returncode = commandThis.poll()
                         if returncode is not None:
-                            output_line = commandThis.stdout.read().decode('utf-8')
+                            output_line = commandThis.stdout.read()#.decode('utf-8')
                             if output_line:
                                 self.wfile.write(output_line.encode('utf-8'))
 
-                            error_line = commandThis.stderr.read().decode('utf-8')
+                            error_line = commandThis.stderr.read()#.decode('utf-8')
                             if error_line:
                                 self.wfile.write(error_line.encode('utf-8'))
 
@@ -195,14 +195,14 @@ class Resquest(BaseHTTPRequestHandler):
                             # ready = select.select([commandThis.stdout, commandThis.stderr], [], [], timeout)
                             # if commandThis.stdout in ready[0]:
                         print('读取%d次数据...stdout.' % i)
-                        output_line = commandThis.stdout.read().decode('utf-8')
+                        output_line = commandThis.stdout.read()#.decode('utf-8')
                         if output_line:
                             self.wfile.write(output_line.encode('utf-8'))
                             self.wfile.flush()
 
                             # if commandThis.stderr in ready[0]:
                         print('读取%d次数据...stderr.' % i)
-                        error_line = commandThis.stderr.read().decode('utf-8')
+                        error_line = commandThis.stderr.read()#.decode('utf-8')
                         if error_line:
                             self.wfile.write(error_line.encode('utf-8'))
                             self.wfile.flush()
