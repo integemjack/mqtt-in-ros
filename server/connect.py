@@ -231,6 +231,8 @@ class Resquest(BaseHTTPRequestHandler):
     def do_POST(self):
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         if ctype == 'multipart/form-data':
+            # Ensure that boundary is bytes, not str
+            pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
             postvars = cgi.parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers.get('Content-Length'))
