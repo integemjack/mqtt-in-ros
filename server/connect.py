@@ -228,8 +228,10 @@ class Resquest(BaseHTTPRequestHandler):
         self.wfile.write(buf.encode())
 
     def do_POST(self):
-        # datas = self.rfile.read(int(self.headers['content-length']))
-        # datas = urllib.unquote(datas).decode("utf-8", 'ignore')
+        datas = self.rfile.read(int(self.headers['content-length']))
+        datas = urllib.unquote(datas).decode("utf-8", 'ignore')
+
+        print(datas)
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")

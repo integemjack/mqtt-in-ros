@@ -101,3 +101,10 @@ chmod +x -R ~/mqtt_ws
 sudo mv ~/mqtt_ws/src/mqtt/server/connect.service /etc/systemd/system/connect.service
 sudo systemctl enable connect
 sudo systemctl start connect
+
+
+# install jupyter
+sudo apt install jupyter -y
+sudo jupyter notebook --generate-config
+sudo sed -i "s/#c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" /root/.jupyter/jupyter_notebook_config.py
+sudo sed -i "s/#c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" /root/.jupyter/jupyter_notebook_config.py
