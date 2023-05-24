@@ -267,7 +267,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.end_headers()
 
         print(postvars_utf8)
-        topic = postvars_utf8['machineid']
+        topic = postvars_utf8['machineid'][0]
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -280,9 +280,9 @@ class Resquest(BaseHTTPRequestHandler):
         path = paths[0]
 
         if path == '/command':
-            if postvars_utf8['command'] and postvars_utf8['command'] != '':
+            if postvars_utf8['command'] and postvars_utf8['command'][0] != '':
                 try:
-                    command = postvars_utf8['command']
+                    command = postvars_utf8['command'][0]
                     print(command)
                     proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
                                             preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
