@@ -162,3 +162,32 @@ roslaunch apriltag_ros continuous_detection.launch
 # 查看输出信息
 rostopic echo /tag_detections
 ```
+
+## 使用 http 测试运行软件
+
+### 安装 jupyter
+
+```
+# install jupyter
+sudo apt install jupyter -y
+sudo jupyter notebook --generate-config
+sudo sed -i "s/#c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" /root/.jupyter/jupyter_notebook_config.py
+sudo sed -i "s/#c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" /root/.jupyter/jupyter_notebook_config.py
+```
+
+### 主体
+
+```
+sudo su
+python3 /home/nvidia/mqtt_ws/src/mqtt/server/connect.py
+```
+
+### http 命令
+
+```
+# http://192.168.253.129/command?machineid=car1&command=jupyter%20notebook%20--allow-root 运行指定指令，%20为空格
+# 网页中打开后，获取 pid值
+# http://192.168.253.129/watch?machineid=car1&pid=<pid> 查看命令运行的日志
+# 可以查看到 jupyter 地址
+# http://192.168.253.129/stop?machineid=car1&pid=<pid> 可以结束命令
+```
