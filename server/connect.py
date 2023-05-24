@@ -1,5 +1,6 @@
 import cgi
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
 from socketserver import ThreadingMixIn
 import subprocess
 import os
@@ -237,11 +238,16 @@ class Resquest(BaseHTTPRequestHandler):
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers.get('Content-Length'))
             postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        elif ctype == 'application/json':
+            content_length = int(self.headers.get('Content-Length'))
+            post_data = self.rfile.read(content_length)
+            postvars = json.loads(post_data)
         else:
             postvars = {}
         # now you can use postvars
 
         print(postvars)
+        print(self.path)
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
