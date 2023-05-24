@@ -161,11 +161,11 @@ class Resquest(BaseHTTPRequestHandler):
                     # Set the stdout to non-blocking
                     fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL, flagse | os.O_NONBLOCK)
 
-                    i = 0
+                    # i = 0
 
                     while True:
-                        i += 1
-                        print('读取%d次数据...' % i)
+                        # i += 1
+                        # print('读取%d次数据...' % i)
 
                         # 检查子进程的状态
                         returncode = commandThis.poll()
@@ -181,27 +181,27 @@ class Resquest(BaseHTTPRequestHandler):
                             self.wfile.write(("exit(%d)" % returncode).encode())
                             break
 
-                        print('读取%d次数据...stdout.' % i)
+                        # print('读取%d次数据...stdout.' % i)
                         output_line = commandThis.stdout.read()#.decode('utf-8')
                         if output_line:
                             self.wfile.write(output_line)
                             self.wfile.flush()
 
-                        print('读取%d次数据...stderr.' % i)
+                        # print('读取%d次数据...stderr.' % i)
                         error_line = commandThis.stderr.read()#.decode('utf-8')
                         if error_line:
                             self.wfile.write(error_line)
                             self.wfile.flush()
 
-                        print('读取%d次数据...完成.' % i)
+                        # print('读取%d次数据...完成.' % i)
 
-                        print(self.wfile.closed)
+                        # print(self.wfile.closed)
                         if self.wfile.closed:
                             print('网页关闭.')
                             # Check if the connection is closed
                             break
                         
-                        time.sleep(1)
+                        # time.sleep(1)
 
                     return
 
