@@ -41,7 +41,7 @@ class Resquest(BaseHTTPRequestHandler):
         print(params)
 
         topic = params['machineid'][0]
-        global pid, ip, port, command, commands
+        global pid, ip, port, command, commands, logs
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
