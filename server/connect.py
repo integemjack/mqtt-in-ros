@@ -191,16 +191,19 @@ class Resquest(BaseHTTPRequestHandler):
 
                             elapsed_time = time.time() - start_time
                             if elapsed_time >= timeout:
+                                print('读取一次数据...%d...失败.' % i)
                                 # Timeout occurred, break the inner loop
                                 break
 
                             if self.wfile.closed:
+                                print('网页关闭.')
                                 # Check if the connection is closed
                                 break
 
                         print('读取一次数据...%d...完成.' % i)
 
                         if self.wfile.closed:
+                            print('网页关闭.')
                             # Check if the connection is closed
                             break
 
