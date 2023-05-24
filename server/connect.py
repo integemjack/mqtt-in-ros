@@ -64,7 +64,9 @@ class Resquest(BaseHTTPRequestHandler):
             buf = "{\"suceesss\": true, \"pid\": %d}" % self.proc.pid
             pid = self.proc.pid
             commands["%d" % self.proc.pid] = self.proc
+            logs["%d" % self.proc.pid] = b''
             time.sleep(1)
+
             commandThis = commands["%d" % pid]
             # Set the timeout for reading subprocess output
             commandThis.stdout.timeout = 1  # Set timeout to 1 second
@@ -123,6 +125,7 @@ class Resquest(BaseHTTPRequestHandler):
                         proc.pid)
                     commands["%d" % proc.pid] = proc
                     thisPid = proc.pid
+                    logs["%d" % thisPid] = b''
                     time.sleep(1)
 
                     commandThis = commands["%d" % thisPid]
