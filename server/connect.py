@@ -15,6 +15,7 @@ ip = '*'
 port = 0
 command = ""
 commands = {}
+logs = {}
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
@@ -145,6 +146,9 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/watch':
             if len(params['pid']) > 0:
                 try:
+
+                    self.wfile.write(logs[params['pid'][0]])
+
                     commandThis = commands[params['pid'][0]]
                     # Set the timeout for reading subprocess output
                     commandThis.stdout.timeout = 1  # Set timeout to 1 second
@@ -170,6 +174,7 @@ class Resquest(BaseHTTPRequestHandler):
                         # 检查子进程的状态
                         returncode = commandThis.poll()
                         if returncode is not None:
+                            logs[params['pid'][0]] = ''
                             output_line = commandThis.stdout.read()#.decode('utf-8')
                             if output_line:
                                 self.wfile.write(output_line) #.encode('utf-8')
@@ -184,12 +189,14 @@ class Resquest(BaseHTTPRequestHandler):
                         # print('读取%d次数据...stdout.' % i)
                         output_line = commandThis.stdout.read()#.decode('utf-8')
                         if output_line:
+                            logs[params['pid'][0]] += output_line
                             self.wfile.write(output_line)
                             self.wfile.flush()
 
                         # print('读取%d次数据...stderr.' % i)
                         error_line = commandThis.stderr.read()#.decode('utf-8')
                         if error_line:
+                            logs[params['pid'][0]] += error_line
                             self.wfile.write(error_line)
                             self.wfile.flush()
 
