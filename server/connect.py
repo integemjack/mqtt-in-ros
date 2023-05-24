@@ -154,6 +154,11 @@ class Resquest(BaseHTTPRequestHandler):
                     timeout = 3  # 设置超时时间为5秒
 
                     while True:
+                        if self.wfile.closed:
+                            print('网页关闭.')
+                            # Check if the connection is closed
+                            break
+
                         i += 1
                         print('读取%d次数据...' % i)
 
@@ -203,10 +208,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                         print('读取%d次数据...完成.' % i)
 
-                        if self.wfile.closed:
-                            print('网页关闭.')
-                            # Check if the connection is closed
-                            break
+
 
                     return
 
