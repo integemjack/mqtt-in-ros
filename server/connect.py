@@ -206,6 +206,7 @@ class Resquest(BaseHTTPRequestHandler):
                     return
 
                 except Exception as e:
+                    print('结束循环.')
                     buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
                     self.wfile.write(buf.encode())
             else:
