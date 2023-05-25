@@ -128,8 +128,8 @@ class MqttToRosBridge(Bridge):
         global pid
 
         try:
-            msg = mqtt_msg.payload.decode('UTF-8').split(":")
-            rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split(":"))
+            msg = mqtt_msg.payload.decode('UTF-8').split("|")
+            rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split("|"))
 
             if msg[0] == 'start':
                 cmd = []
