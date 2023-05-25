@@ -60,7 +60,7 @@ def exec_command(command):
 
     return buf, thisPid
 
-def watch(self, pid, once=False):
+def watch(self, pid, once=False, output=True):
     if pid:
         try:
             print(logs[pid])
@@ -96,11 +96,11 @@ def watch(self, pid, once=False):
                 if returncode is not None:
                     logs[pid] = b''
                     output_line = commandThis.stdout.read()#.decode('utf-8')
-                    if output_line:
+                    if output_line and output:
                         self.wfile.write(output_line) #.encode('utf-8')
 
                     error_line = commandThis.stderr.read()#.decode('utf-8')
-                    if error_line:
+                    if error_line and output:
                         self.wfile.write(error_line) #.encode('utf-8')
 
                     self.wfile.write(("exit(%d)" % returncode).encode())
@@ -110,15 +110,17 @@ def watch(self, pid, once=False):
                 output_line = commandThis.stdout.read()#.decode('utf-8')
                 if output_line:
                     logs[pid] += output_line
-                    self.wfile.write(output_line)
-                    self.wfile.flush()
+                    if output:
+                        self.wfile.write(output_line)
+                        self.wfile.flush()
 
                 # print('读取%d次数据...stderr.' % i)
                 error_line = commandThis.stderr.read()#.decode('utf-8')
                 if error_line:
                     logs[pid] += error_line
-                    self.wfile.write(error_line)
-                    self.wfile.flush()
+                    if output:
+                        self.wfile.write(error_line)
+                        self.wfile.flush()
 
                 # print('读取%d次数据...完成.' % i)
 
@@ -243,7 +245,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
             try:
-                watch(self, "%d" % thisPid, True)
+                watch(self, "%d" % thisPid, once=True, output=False)
                 log = logs["%d" % thisPid].decode('utf-8')
                 print("log=", end="")
                 print(log)
@@ -273,7 +275,8 @@ class Resquest(BaseHTTPRequestHandler):
                 buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
 
         self.end_headers()
-        self.wfile.write(buf.encode())
+        if path != '/jupyter':
+            self.wfile.write(buf.encode())
 
     def do_POST(self):
         global pid, ip, port, command, commands, logs
