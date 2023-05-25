@@ -243,7 +243,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
             watch(self, thisPid, True)
-            log = logs["%d" % thisPid].encode('utf-8')
+            log = logs["%d" % thisPid].decode('utf-8')
 
             match = re.search(r'http://0.0.0.0:(\d+)/', log)
             if match:
