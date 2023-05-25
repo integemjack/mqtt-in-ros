@@ -1,6 +1,7 @@
 import cgi
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import re
 from socketserver import ThreadingMixIn
 import subprocess
 import os
@@ -23,6 +24,124 @@ logs = {}
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
+def exec_command(command):
+    global commands, logs
+    print(command)
+    thisPid = -1
+    if command:
+        try:
+            proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
+                                    preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            buf = "{\"suceesss\": true, \"pid\": %d}" % (
+                proc.pid)
+            commands["%d" % proc.pid] = proc
+            thisPid = proc.pid
+            logs["%d" % thisPid] = b''
+            time.sleep(1)
+
+            commandThis = commands["%d" % thisPid]
+            # Set the timeout for reading subprocess output
+            commandThis.stdout.timeout = 1  # Set timeout to 1 second
+            commandThis.stderr.timeout = 1  # Set timeout to 1 second
+            returncode = commandThis.poll()
+            if returncode is not None:
+                output_line = commandThis.stdout.read().decode('utf-8')
+                error_line = commandThis.stderr.read().decode('utf-8')
+                success = "true"
+                if error_line != "":
+                    success = "false"
+                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
+
+        except Exception as e:
+            buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
+    else:
+        buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
+
+    return buf, thisPid
+
+def watch(self, pid, once=False):
+    if pid:
+        try:
+            print(logs[pid])
+            if logs[pid]:
+                self.wfile.write(logs[pid])
+            else:
+                logs[pid] = b''
+
+            commandThis = commands[pid]
+            # Set the timeout for reading subprocess output
+            commandThis.stdout.timeout = 1  # Set timeout to 1 second
+            commandThis.stderr.timeout = 1  # Set timeout to 1 second
+            self.send_header("Content-type", "text/plain")
+
+            # Get the current stdout flags
+            flags = fcntl.fcntl(commandThis.stdout, fcntl.F_GETFL)
+            # Set the stdout to non-blocking
+            fcntl.fcntl(commandThis.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
+            # Get the current stdout flags
+            flagse = fcntl.fcntl(commandThis.stderr, fcntl.F_GETFL)
+            # Set the stdout to non-blocking
+            fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL, flagse | os.O_NONBLOCK)
+
+            # i = 0
+
+            while True:
+                # i += 1
+                # print('读取%d次数据...' % i)
+
+                # 检查子进程的状态
+                returncode = commandThis.poll()
+                if returncode is not None:
+                    logs[pid] = b''
+                    output_line = commandThis.stdout.read()#.decode('utf-8')
+                    if output_line:
+                        self.wfile.write(output_line) #.encode('utf-8')
+
+                    error_line = commandThis.stderr.read()#.decode('utf-8')
+                    if error_line:
+                        self.wfile.write(error_line) #.encode('utf-8')
+
+                    self.wfile.write(("exit(%d)" % returncode).encode())
+                    break
+
+                # print('读取%d次数据...stdout.' % i)
+                output_line = commandThis.stdout.read()#.decode('utf-8')
+                if output_line:
+                    logs[pid] += output_line
+                    self.wfile.write(output_line)
+                    self.wfile.flush()
+
+                # print('读取%d次数据...stderr.' % i)
+                error_line = commandThis.stderr.read()#.decode('utf-8')
+                if error_line:
+                    logs[pid] += error_line
+                    self.wfile.write(error_line)
+                    self.wfile.flush()
+
+                # print('读取%d次数据...完成.' % i)
+
+                # print(self.wfile.closed)
+                if self.wfile.closed:
+                    print('网页关闭.')
+                    # Check if the connection is closed
+                    break
+                
+                if once:
+                    break
+                # time.sleep(1)
+
+            return
+
+        except Exception as e:
+            print('结束循环.')
+            print(e)
+            buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
+    else:
+        buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
+
+    return buf
 
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
@@ -31,7 +150,6 @@ class Resquest(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/json")
-        self.end_headers()
 
         paths = self.path.split('?', 1)
         print(paths)
@@ -43,7 +161,7 @@ class Resquest(BaseHTTPRequestHandler):
         print(params)
 
         topic = params['machineid'][0]
-        global pid, ip, port, command, commands, logs
+        global pid, ip, port, command, commands, logs, exec_command
 
         buf = 'no function'
         print('machineId: "', machineId(), '"  topic: ', topic)
@@ -116,117 +234,35 @@ class Resquest(BaseHTTPRequestHandler):
                 mqtt_connect, ip, port) + "}"
 
         elif path == '/command':
-            if len(params['command']) > 0:
-                try:
-                    command = params['command'][0]
-                    print(command)
-                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
-                                            preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-                    buf = "{\"suceesss\": true, \"pid\": %d}" % (
-                        proc.pid)
-                    commands["%d" % proc.pid] = proc
-                    thisPid = proc.pid
-                    logs["%d" % thisPid] = b''
-                    time.sleep(1)
-
-                    commandThis = commands["%d" % thisPid]
-                    # Set the timeout for reading subprocess output
-                    commandThis.stdout.timeout = 1  # Set timeout to 1 second
-                    commandThis.stderr.timeout = 1  # Set timeout to 1 second
-                    returncode = commandThis.poll()
-                    if returncode is not None:
-                        output_line = commandThis.stdout.read().decode('utf-8')
-                        error_line = commandThis.stderr.read().decode('utf-8')
-                        success = "true"
-                        if error_line != "":
-                            success = "false"
-                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
-
-                except Exception as e:
-                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
-            else:
-                buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
+            buf, thisPid = exec_command(params['command'][0])
 
         elif path == '/watch':
-            if len(params['pid']) > 0:
-                try:
-                    print(logs[params['pid'][0]])
-                    if logs[params['pid'][0]]:
-                        self.wfile.write(logs[params['pid'][0]])
-                    else:
-                        logs[params['pid'][0]] = b''
+            buf = watch(self, params['pid'][0])
 
-                    commandThis = commands[params['pid'][0]]
-                    # Set the timeout for reading subprocess output
-                    commandThis.stdout.timeout = 1  # Set timeout to 1 second
-                    commandThis.stderr.timeout = 1  # Set timeout to 1 second
-                    self.send_header("Content-type", "text/plain")
+        elif path == '/jupyter':
+            buf, thisPid = exec_command(params['command'][0])
+            time.sleep(3)
+            watch(self, thisPid, True)
+            log = logs["%d" % thisPid].encode('utf-8')
 
-                    # Get the current stdout flags
-                    flags = fcntl.fcntl(commandThis.stdout, fcntl.F_GETFL)
-                    # Set the stdout to non-blocking
-                    fcntl.fcntl(commandThis.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            match = re.search(r'http://0.0.0.0:(\d+)/', log)
+            if match:
+                port = match.group(1)
+                print(port)  # 输出: 8909
 
-                    # Get the current stdout flags
-                    flagse = fcntl.fcntl(commandThis.stderr, fcntl.F_GETFL)
-                    # Set the stdout to non-blocking
-                    fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL, flagse | os.O_NONBLOCK)
+            match = re.search(r'token=([a-zA-Z0-9]+)', log)
+            if match:
+                token = match.group(1)
+                print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
-                    # i = 0
+            client_host, client_port = self.client_address
 
-                    while True:
-                        # i += 1
-                        # print('读取%d次数据...' % i)
+            url = "http://{}:{}/token={}".format(client_host, port, token)
 
-                        # 检查子进程的状态
-                        returncode = commandThis.poll()
-                        if returncode is not None:
-                            logs[params['pid'][0]] = b''
-                            output_line = commandThis.stdout.read()#.decode('utf-8')
-                            if output_line:
-                                self.wfile.write(output_line) #.encode('utf-8')
+            self.send_response(301)
+            self.send_header('Location', url)
 
-                            error_line = commandThis.stderr.read()#.decode('utf-8')
-                            if error_line:
-                                self.wfile.write(error_line) #.encode('utf-8')
-
-                            self.wfile.write(("exit(%d)" % returncode).encode())
-                            break
-
-                        # print('读取%d次数据...stdout.' % i)
-                        output_line = commandThis.stdout.read()#.decode('utf-8')
-                        if output_line:
-                            logs[params['pid'][0]] += output_line
-                            self.wfile.write(output_line)
-                            self.wfile.flush()
-
-                        # print('读取%d次数据...stderr.' % i)
-                        error_line = commandThis.stderr.read()#.decode('utf-8')
-                        if error_line:
-                            logs[params['pid'][0]] += error_line
-                            self.wfile.write(error_line)
-                            self.wfile.flush()
-
-                        # print('读取%d次数据...完成.' % i)
-
-                        # print(self.wfile.closed)
-                        if self.wfile.closed:
-                            print('网页关闭.')
-                            # Check if the connection is closed
-                            break
-                        
-                        # time.sleep(1)
-
-                    return
-
-                except Exception as e:
-                    print('结束循环.')
-                    print(e)
-                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
-            else:
-                buf = "{\"suceesss\": false, \"error\": \"No pid\"}"
-
+        self.end_headers()
         self.wfile.write(buf.encode())
 
     def do_POST(self):
@@ -267,7 +303,7 @@ class Resquest(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header("Content-type", "text/json")
-        self.end_headers()
+
 
         print(postvars_utf8)
         topic = postvars_utf8['machineid']
@@ -283,38 +319,9 @@ class Resquest(BaseHTTPRequestHandler):
         path = paths[0]
 
         if path == '/command':
-            if postvars_utf8['command'] and postvars_utf8['command'] != '':
-                try:
-                    command = postvars_utf8['command']
-                    print(command)
-                    proc = subprocess.Popen(command, shell=True, executable="/bin/bash",
-                                            preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-                    buf = "{\"suceesss\": true, \"pid\": %d}" % (
-                        proc.pid)
-                    commands["%d" % proc.pid] = proc
-                    thisPid = proc.pid
-                    logs["%d" % thisPid] = b''
-                    time.sleep(1)
-
-                    commandThis = commands["%d" % thisPid]
-                    # Set the timeout for reading subprocess output
-                    commandThis.stdout.timeout = 1  # Set timeout to 1 second
-                    commandThis.stderr.timeout = 1  # Set timeout to 1 second
-                    returncode = commandThis.poll()
-                    if returncode is not None:
-                        output_line = commandThis.stdout.read().decode('utf-8')
-                        error_line = commandThis.stderr.read().decode('utf-8')
-                        success = "true"
-                        if error_line != "":
-                            success = "false"
-                        buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
-
-                except Exception as e:
-                    buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
-            else:
-                buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
-
+            buf, thisPid = exec_command(postvars_utf8['command'])
+        
+        self.end_headers()
         self.wfile.write(buf.encode())
 
 
