@@ -270,7 +270,7 @@ class Resquest(BaseHTTPRequestHandler):
                     print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
 
-                url = "http://{}:{}/token={}".format(get_lan_ip(), port, token)
+                url = "http://{}:{}/?token={}".format(get_lan_ip(), port, token)
 
                 print("url=", end="")
                 print(url)
