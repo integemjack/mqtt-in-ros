@@ -242,25 +242,31 @@ class Resquest(BaseHTTPRequestHandler):
         elif path == '/jupyter':
             buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
-            watch(self, thisPid, True)
-            log = logs["%d" % thisPid].decode('utf-8')
+            try:
+                watch(self, thisPid, True)
+                log = logs["%d" % thisPid].decode('utf-8')
 
-            match = re.search(r'http://0.0.0.0:(\d+)/', log)
-            if match:
-                port = match.group(1)
-                print(port)  # 输出: 8909
+                token = ""
+                port = ""
+                match = re.search(r'http://0.0.0.0:(\d+)/', log)
+                if match:
+                    port = match.group(1)
+                    print(port)  # 输出: 8909
 
-            match = re.search(r'token=([a-zA-Z0-9]+)', log)
-            if match:
-                token = match.group(1)
-                print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
+                match = re.search(r'token=([a-zA-Z0-9]+)', log)
+                if match:
+                    token = match.group(1)
+                    print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
-            client_host, client_port = self.client_address
+                client_host, client_port = self.client_address
 
-            url = "http://{}:{}/token={}".format(client_host, port, token)
+                url = "http://{}:{}/token={}".format(client_host, port, token)
 
-            self.send_response(301)
-            self.send_header('Location', url)
+                self.send_response(301)
+                self.send_header('Location', url)
+            
+            except Exception as e:
+                buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
 
         self.end_headers()
         self.wfile.write(buf.encode())
