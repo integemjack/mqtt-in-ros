@@ -269,9 +269,8 @@ class Resquest(BaseHTTPRequestHandler):
                     token = match.group(1)
                     print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
-                client_host, client_port = self.client_address
 
-                url = "http://{}:{}/token={}".format(client_host, port, token)
+                url = "http://{}:{}/token={}".format(get_lan_ip(), port, token)
 
                 print("url=", end="")
                 print(url)
