@@ -245,6 +245,7 @@ class Resquest(BaseHTTPRequestHandler):
             try:
                 watch(self, thisPid, True)
                 log = logs["%d" % thisPid].decode('utf-8')
+                print(log)
 
                 token = ""
                 port = ""
