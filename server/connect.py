@@ -72,7 +72,7 @@ def watch(self, pid, once=False, output=True):
     if pid:
         try:
             print(logs[pid])
-            if logs[pid]:
+            if logs[pid] and output:
                 self.wfile.write(logs[pid])
             else:
                 logs[pid] = b''
