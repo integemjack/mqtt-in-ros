@@ -245,6 +245,7 @@ class Resquest(BaseHTTPRequestHandler):
             try:
                 watch(self, thisPid, True)
                 log = logs["%d" % thisPid].decode('utf-8')
+                print("log=", end="")
                 print(log)
 
                 token = ""
@@ -263,6 +264,8 @@ class Resquest(BaseHTTPRequestHandler):
 
                 url = "http://{}:{}/token={}".format(client_host, port, token)
 
+                print("url=", end="")
+                print(url)
                 self.send_response(301)
                 self.send_header('Location', url)
             
