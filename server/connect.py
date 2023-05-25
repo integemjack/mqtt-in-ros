@@ -252,22 +252,24 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
             try:
-                watch(self, "%d" % thisPid, once=True, output=False)
-                log = logs["%d" % thisPid].decode('utf-8')
-                print("log=", end="")
-                print(log)
-
+                log = ""
                 token = ""
                 port = ""
-                match = re.search(r'http://0.0.0.0:(\d+)/', log)
-                if match:
-                    port = match.group(1)
-                    print(port)  # 输出: 8909
+                while re.search(r'http://0.0.0.0:(\d+)/', log) is None:
+                    watch(self, "%d" % thisPid, once=True, output=False)
+                    log = logs["%d" % thisPid].decode('utf-8')
+                    print("log=", end="")
+                    print(log)
 
-                match = re.search(r'token=([a-zA-Z0-9]+)', log)
-                if match:
-                    token = match.group(1)
-                    print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
+                    match = re.search(r'http://0.0.0.0:(\d+)/', log)
+                    if match:
+                        port = match.group(1)
+                        print(port)  # 输出: 8909
+
+                    match = re.search(r'token=([a-zA-Z0-9]+)', log)
+                    if match:
+                        token = match.group(1)
+                        print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
 
                 url = "http://{}:{}/?token={}".format(get_lan_ip(), port, token)
