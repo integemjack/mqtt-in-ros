@@ -2,6 +2,7 @@ import cgi
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 import re
+import socket
 from socketserver import ThreadingMixIn
 import subprocess
 import os
@@ -21,8 +22,15 @@ commands = {}
 logs = {}
 
 
-class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    pass
+def get_lan_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return None
 
 def exec_command(command):
     global commands, logs
@@ -145,6 +153,8 @@ def watch(self, pid, once=False, output=True):
 
     return buf
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
     server_version = "ROS"
