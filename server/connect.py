@@ -73,7 +73,7 @@ def watch(self, pid, once=False, output=True):
             # Set the timeout for reading subprocess output
             commandThis.stdout.timeout = 1  # Set timeout to 1 second
             commandThis.stderr.timeout = 1  # Set timeout to 1 second
-            self.send_header("Content-type", "text/plain")
+            # self.send_header("Content-type", "text/plain")
 
             # Get the current stdout flags
             flags = fcntl.fcntl(commandThis.stdout, fcntl.F_GETFL)
@@ -150,9 +150,6 @@ class Resquest(BaseHTTPRequestHandler):
     server_version = "ROS"
 
     def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/json")
-
         paths = self.path.split('?', 1)
         print(paths)
         path = paths[0]
@@ -270,12 +267,23 @@ class Resquest(BaseHTTPRequestHandler):
                 print(url)
                 self.send_response(301)
                 self.send_header('Location', url)
-            
+                self.end_headers()
+
             except Exception as e:
                 buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
 
-        self.end_headers()
-        if path != '/jupyter':
+        
+        if path == '/jupyter':
+            pass
+        elif path == "/watch":
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(buf.encode())
+        else:
+            self.send_response(200)
+            self.send_header("Content-type", "text/json")
+            self.end_headers()
             self.wfile.write(buf.encode())
 
     def do_POST(self):
