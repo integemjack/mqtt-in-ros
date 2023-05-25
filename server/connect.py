@@ -128,7 +128,7 @@ def watch(self, pid, once=False):
                     # Check if the connection is closed
                     break
                 
-                if once:
+                if once and logs[pid] != b'':
                     break
                 # time.sleep(1)
 
@@ -243,7 +243,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
             try:
-                watch(self, thisPid, True)
+                watch(self, "%d" % thisPid, True)
                 log = logs["%d" % thisPid].decode('utf-8')
                 print("log=", end="")
                 print(log)
