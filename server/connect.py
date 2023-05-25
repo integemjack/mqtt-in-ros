@@ -240,7 +240,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = watch(self, params['pid'][0])
 
         elif path == '/jupyter':
-            buf, thisPid = exec_command(params['command'][0])
+            buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
             time.sleep(3)
             watch(self, thisPid, True)
             log = logs["%d" % thisPid].encode('utf-8')
