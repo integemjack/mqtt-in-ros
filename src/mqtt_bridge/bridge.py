@@ -143,11 +143,11 @@ class MqttToRosBridge(Bridge):
                 if msg[1] == 'detectnet':
                     # cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
                     #     msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480) + ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
-                    cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch" +
+                    cmd = ["cd /home/nvidia/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch" +
                            ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                 elif msg[1] == 'apriltag':
-                    cmd = ["cd ~/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5",
-                           "cd ~/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
+                    cmd = ["cd /home/nvidia/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5",
+                           "cd /home/nvidia/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
                 rospy.loginfo(cmd)
                 # , preexec_fn=os.setsid)
                 if len(cmd) > 0:
