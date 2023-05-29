@@ -255,13 +255,13 @@ class Resquest(BaseHTTPRequestHandler):
                 log = ""
                 token = ""
                 port = ""
-                while re.search(r'http://0.0.0.0:(\d+)/', log) is None:
+                while re.search(r'http://127.0.0.1:(\d+)/', log) is None:
                     watch(self, "%d" % thisPid, once=True, output=False)
                     log = logs["%d" % thisPid].decode('utf-8')
                     print("log=", end="")
                     print(log)
 
-                    match = re.search(r'http://0.0.0.0:(\d+)/', log)
+                    match = re.search(r'http://127.0.0.1:(\d+)/', log)
                     if match:
                         port = match.group(1)
                         print(port)  # 输出: 8909
