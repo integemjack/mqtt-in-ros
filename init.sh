@@ -108,3 +108,14 @@ sudo apt install jupyter -y
 sudo jupyter notebook --generate-config
 sudo sed -i "s/#c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" /root/.jupyter/jupyter_notebook_config.py
 sudo sed -i "s/#c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" /root/.jupyter/jupyter_notebook_config.py
+
+# install jupyter lab
+sudo su
+cd /home/nvidia
+pip3 install virtualenv
+virtualenv myenv
+source myenv/bin/activate
+pip3 install jupyterlab
+jupyter lab --generate-config
+sed -i "s/#c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" /root/.jupyter/jupyter_lab_config.py
+sed -i "s/#c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" /root/.jupyter/jupyter_lab_config.py
