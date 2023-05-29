@@ -145,6 +145,12 @@ class MqttToRosBridge(Bridge):
                     #     msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480) + ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                     cmd = ["cd /home/nvidia/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch" +
                            ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
+                elif msg[1] == 'imagenet':
+                    cmd = ["cd /home/nvidia/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning imagenet.ros1.launch" +
+                           ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
+                elif msg[1] == 'videoviewer':
+                    cmd = ["cd /home/nvidia/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning video_viewer.ros1.launch" +
+                           ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                 elif msg[1] == 'apriltag':
                     cmd = ["cd /home/nvidia/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5",
                            "cd /home/nvidia/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]

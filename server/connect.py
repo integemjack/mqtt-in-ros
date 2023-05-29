@@ -249,7 +249,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = watch(self, params['pid'][0])
 
         elif path == '/jupyter':
-            buf, thisPid = exec_command("cd / && jupyter notebook --allow-root")
+            buf, thisPid = exec_command("cd / && source /home/nvidia/myenv/bin/activate && jupyter lab --allow-root")
             time.sleep(3)
             try:
                 log = ""
