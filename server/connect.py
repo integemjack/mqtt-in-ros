@@ -272,7 +272,7 @@ class Resquest(BaseHTTPRequestHandler):
                         print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
 
 
-                url = "http://nvidia-desktop:{}/lab?token={}".format(port, token)
+                url = "http://{}:{}/lab?token={}".format(get_lan_ip(), port, token)
 
                 print("url=", end="")
                 print(url)
