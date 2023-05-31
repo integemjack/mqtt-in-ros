@@ -270,7 +270,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf = watch(self, params['pid'][0])
 
         elif path == '/jupyter':
-            buf, thisPid = exec_command("cd / && source /home/nvidia/myenv/bin/activate && source /opt/ros/melodic/setup.bash && source /home/nvidia/mqtt_ws/devel/setup.bash && jupyter lab --port 2013 --allow-root")
+            buf, thisPid = exec_command("cd /home/nvidia/mqtt_ws/src/mqtt && source /home/nvidia/myenv/bin/activate && source /opt/ros/melodic/setup.bash && source /home/nvidia/mqtt_ws/devel/setup.bash && jupyter lab --port 2013 --allow-root")
             time.sleep(3)
             try:
                 log = ""
