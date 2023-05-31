@@ -416,7 +416,7 @@ if __name__ == '__main__':
             writeFile('/home/nvidia/Desktop/connect.log', 'LCD操作完成!\n', status='a')
     except Exception as e:
         print(e)
-        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n')
+        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n', status='a')
     
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
