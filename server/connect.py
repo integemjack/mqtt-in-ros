@@ -403,6 +403,7 @@ if __name__ == '__main__':
             draw.text((20, 30), get_lan_ip(), fill="white")
     except Exception as e:
         print(e)
+        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '')
     
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
