@@ -402,21 +402,24 @@ def machineId():
 
 
 if __name__ == '__main__':
-    try:
-        # 创建 I2C 设备
-        serial = i2c(port=1, address=0x3c)
+    lcd = False
+    while lcd is not True:
+        try:
+            # 创建 I2C 设备
+            serial = i2c(port=0, address=0x3c)
 
-        # 创建 SSD1306 OLED 设备
-        device = ssd1306(serial)
+            # 创建 SSD1306 OLED 设备
+            device = ssd1306(serial)
 
-        # 创建画布并在画布上绘制
-        with canvas(device) as draw:
-            draw.text((20, 20), "IP Address:", fill="white")
-            draw.text((20, 30), get_lan_ip(), fill="white")
-            writeFile('/home/nvidia/Desktop/connect.log', 'LCD操作完成!\n', status='a')
-    except Exception as e:
-        print(e)
-        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n', status='a')
+            # 创建画布并在画布上绘制
+            with canvas(device) as draw:
+                draw.text((20, 20), "IP Address:", fill="white")
+                draw.text((20, 30), get_lan_ip(), fill="white")
+                writeFile('/home/nvidia/Desktop/connect.log', 'LCD操作完成!\n', status='a')
+                lcd = True
+        except Exception as e:
+            print(e)
+            writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n', status='a')
     
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
