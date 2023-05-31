@@ -164,9 +164,9 @@ class Resquest(BaseHTTPRequestHandler):
     server_version = "ROS"
 
     def do_GET(self):
-        self.send_header('Cache-Control', 'no-store, must-revalidate')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
+        # self.send_header('Cache-Control', 'no-store, must-revalidate')
+        # self.send_header('Pragma', 'no-cache')
+        # self.send_header('Expires', '0')
         paths = self.path.split('?', 1)
         print(paths)
         path = paths[0]
@@ -311,9 +311,9 @@ class Resquest(BaseHTTPRequestHandler):
             self.wfile.write(buf.encode())
 
     def do_POST(self):
-        self.send_header('Cache-Control', 'no-store, must-revalidate')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
+        # self.send_header('Cache-Control', 'no-store, must-revalidate')
+        # self.send_header('Pragma', 'no-cache')
+        # self.send_header('Expires', '0')
         global pid, ip, port, command, commands, logs
 
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
