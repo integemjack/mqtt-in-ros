@@ -370,8 +370,8 @@ def readFile(file):
     return all_the_text
 
 
-def writeFile(file, all_the_text):
-    file_object = open(file, 'w')
+def writeFile(file, all_the_text, status='w'):
+    file_object = open(file, status)
     file_object.write(all_the_text)
     file_object.close()
 
@@ -401,9 +401,10 @@ if __name__ == '__main__':
         with canvas(device) as draw:
             draw.text((20, 20), "IP Address:", fill="white")
             draw.text((20, 30), get_lan_ip(), fill="white")
+            writeFile('/home/nvidia/Desktop/connect.log', 'LCD操作完成!\n', status='a')
     except Exception as e:
         print(e)
-        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '')
+        writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n')
     
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
