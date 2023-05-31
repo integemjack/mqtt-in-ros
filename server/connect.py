@@ -297,7 +297,7 @@ class Resquest(BaseHTTPRequestHandler):
 
                 print("url=", end="")
                 print(url)
-                self.send_response(301)
+                self.send_response(302)
                 self.send_header('Location', url)
                 self.end_headers()
 
