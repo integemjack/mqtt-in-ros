@@ -404,7 +404,7 @@ def machineId():
 if __name__ == '__main__':
     try:
         # 创建 I2C 设备
-        serial = i2c(port=0, address=0x3c)
+        serial = i2c(port=1, address=0x3c)
 
         # 创建 SSD1306 OLED 设备
         device = ssd1306(serial)
