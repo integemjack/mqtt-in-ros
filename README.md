@@ -1,9 +1,3 @@
-# 修改设备名字
-
-```
-sudo echo "car" > /machineId
-```
-
 ## Demo
 
 ```bash
