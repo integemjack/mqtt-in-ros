@@ -1,0 +1,13 @@
+[Unit]
+Description=fan
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5s
+User=root
+ExecStart=/usr/bin/python3 /home/nvidia/mqtt_ws/src/mqtt/server/fan.py
+ExecReload=/usr/bin/python3 /home/nvidia/mqtt_ws/src/mqtt/server/fan.py
+
+[Install]
+WantedBy=multi-user.target
