@@ -1,4 +1,4 @@
-# 在 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/launch/continuous_detection.launch 中添加
+# 在 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/launch/continuous_detection.launch 中添加 tag_sizes
 
 ```xml
 <launch>
