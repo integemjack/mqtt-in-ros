@@ -403,6 +403,7 @@ def machineId():
 
 if __name__ == '__main__':
     lcd = False
+    ts = 0
     while lcd is not True:
         try:
             # 创建 I2C 设备
@@ -420,6 +421,9 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
             writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n', status='a')
+        ts+=1
+        if ts > 500:
+            break
     
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
