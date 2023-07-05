@@ -56,3 +56,7 @@ bridge:
     msg_type: std_msgs.msg:String
     topic_from: car
     topic_to: ""
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: apriltag_ros.msg:AprilTagDetectionArray
+    topic_from: /tag_detections
+    topic_to: apriltagSize

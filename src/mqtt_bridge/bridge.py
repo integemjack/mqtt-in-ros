@@ -10,6 +10,7 @@ import os
 import signal
 import atexit
 import time
+import json
 
 from .util import lookup_object, extract_values, populate_instance
 
@@ -88,6 +89,27 @@ class RosToMqttBridge(Bridge):
         if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
             # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
             payload = ",".join(['%s' % (d.id[0]) for d in msg.detections])
+#             payload = "[{}]".format(payload)
+        elif (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagSize'):
+            # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+            payload_json = [
+                {
+                    'id': d.id[0],
+                    'position': {
+                        'x': d.pose.pose.pose.position.x,
+                        'y': d.pose.pose.pose.position.y,
+                        'z': d.pose.pose.pose.position.z
+                    },
+                    'orientation': {
+                        'x': d.pose.pose.pose.orientation.x,
+                        'y': d.pose.pose.pose.orientation.y,
+                        'z': d.pose.pose.pose.orientation.z,
+                        'w': d.pose.pose.pose.orientation.w
+                    }
+                }
+                for d in msg.detections
+            ]
+            payload = json.dumps(payload_json)
 #             payload = "[{}]".format(payload)
         elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
             payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
