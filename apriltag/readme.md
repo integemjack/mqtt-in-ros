@@ -1,3 +1,19 @@
+# 1 启动 usb camera
+
+```bash
+cd /home/nvidia/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch
+```
+
+# 2 启动标记程序
+
+```bash
+rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.024 image:=/usb_cam/image_raw camera:=/usb_cam
+# 标记图片地址
+# https://img-blog.csdnimg.cn/20190417091331789.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2N1bmd1ZGFmYQ==,size_16,color_FFFFFF,t_70
+```
+
+# ------------------非必须-------------------------
+
 # 在 /home/nvidia/apriltag_ws/src/apriltag_ros/apriltag_ros/launch/continuous_detection.launch 中添加 tag_sizes
 
 ```xml
