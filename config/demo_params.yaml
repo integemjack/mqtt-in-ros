@@ -60,3 +60,7 @@ bridge:
     msg_type: apriltag_ros.msg:AprilTagDetectionArray
     topic_from: /tag_detections
     topic_to: apriltagSize
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: vision_msgs.msg:Detection2DArray
+    topic_from: /detectnet/detections
+    topic_to: detectnetSize

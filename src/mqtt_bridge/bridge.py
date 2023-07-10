@@ -114,6 +114,24 @@ class RosToMqttBridge(Bridge):
         elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
             payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
                                for d in msg.bounding_boxes])
+        elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetSize'):
+            payload_json = [
+                {
+                    'id': d.results[0].id,
+                    'score': d.results[0].score,
+                    'bbox': {
+                        'center': {
+                            'x': d.bbox.center.x,
+                            'y': d.bbox.center.y,
+                            'theta': d.bbox.center.theta
+                        },
+                        'size_x': d.bbox.size_x,
+                        'size_y': d.bbox.size_y
+                    }
+                }
+                for d in msg.detections
+            ]
+            payload = json.dumps(payload_json)
         else:
             payload = yaml.dump(msg)
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
