@@ -11,10 +11,12 @@ import signal
 import atexit
 import time
 import json
+import glob
 
 from .util import lookup_object, extract_values, populate_instance
 
 pid = []
+labels = []
 
 
 def f():
@@ -84,12 +86,14 @@ class RosToMqttBridge(Bridge):
             self._last_published = now
 
     def _publish(self, msg: rospy.Message):
+        global labels
+
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(msg.detections)
         if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
             # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
             payload = ",".join(['%s' % (d.id[0]) for d in msg.detections])
-#             payload = "[{}]".format(payload)
+            #             payload = "[{}]".format(payload)
         elif (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagSize'):
             # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
             payload_json = [
@@ -110,14 +114,16 @@ class RosToMqttBridge(Bridge):
                 for d in msg.detections
             ]
             payload = json.dumps(payload_json)
-#             payload = "[{}]".format(payload)
+            #             payload = "[{}]".format(payload)
         elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
             payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
                                for d in msg.bounding_boxes])
         elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetSize'):
+            # print(msg.detections)
             payload_json = [
                 {
                     'id': d.results[0].id,
+                    'label': labels[d.results[0].id],
                     'score': d.results[0].score,
                     'bbox': {
                         'center': {
@@ -132,6 +138,22 @@ class RosToMqttBridge(Bridge):
                 for d in msg.detections
             ]
             payload = json.dumps(payload_json)
+        elif (self._topic_from == '/detectnet/vision_info' and self._topic_to == 'vision_info'):
+            # Define the directory
+            dir_path = msg.method
+
+            # Get the .txt files in the directory
+            txt_files = glob.glob(os.path.join(
+                os.path.dirname(dir_path), '*.txt'))
+
+            # For each .txt file
+            for txt_file in txt_files:
+                # Open the file
+                with open(txt_file, 'r') as f:
+                    # Read the lines and convert each line into an element of a list
+                    lines = [line.strip() for line in f]
+                    labels = lines
+            payload = json.dumps(labels)
         else:
             payload = yaml.dump(msg)
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
