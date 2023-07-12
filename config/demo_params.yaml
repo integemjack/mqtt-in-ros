@@ -64,3 +64,7 @@ bridge:
     msg_type: vision_msgs.msg:Detection2DArray
     topic_from: /detectnet/detections
     topic_to: detectnetSize
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: vision_msgs.msg:VisionInfo
+    topic_from: /detectnet/vision_info
+    topic_to: vision_info
