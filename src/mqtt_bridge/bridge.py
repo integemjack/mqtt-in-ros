@@ -1,3 +1,4 @@
+import threading
 from abc import ABCMeta
 from typing import Optional, Type, Dict, Union
 
@@ -182,6 +183,15 @@ class MqttToRosBridge(Bridge):
             self._publisher = rospy.Publisher(
                 self._topic_to, self._msg_type, queue_size=self._queue_size)
 
+    def run_subprocess(self, cmd):
+        global pid
+
+        proc = subprocess.Popen(
+            cmd, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
+        rospy.loginfo("started!")
+        rospy.loginfo(proc)
+        pid.append(proc.pid)
+
     def _callback_mqtt(self, client: mqtt.Client, userdata: Dict, mqtt_msg: mqtt.MQTTMessage):
         """ callback from MQTT """
         rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
@@ -203,8 +213,6 @@ class MqttToRosBridge(Bridge):
                         msgs.append(split_item)
 
                 if msg[1] == 'detectnet':
-                    # cmd = ["cd ~/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch input:=v4l2:///dev/video0 output:=rtp://{}:{} width:={} height:={}".format(
-                    #     msg[2], msg[3] or 1234, msg[4] or 640, msg[5] or 480) + ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                     cmd = ["cd /home/nvidia/ros_workspace/devel && source setup.bash && roslaunch ros_deep_learning detectnet.ros1.launch" +
                            ' ' + ' '.join(['%s' % ':='.join(item) for item in msgs])]
                 elif msg[1] == 'imagenet':
@@ -224,20 +232,12 @@ class MqttToRosBridge(Bridge):
                         if cs[0] == 'sleep':
                             time.sleep(int(cs[1]))
                         elif cs[0] != 'sleep':
-                            self.proc = subprocess.Popen(
-                                c, shell=True, executable="/bin/bash", preexec_fn=os.setsid)
-                            # print(os.getpid())
-                            # os.system(cmd)
-                            # print("second time get pid ")
-                            # print(os.getpid())
-                            rospy.loginfo("started!")
-                            rospy.loginfo(self.proc)
-                            pid.append(self.proc.pid)
+                            thread = threading.Thread(
+                                target=self.run_subprocess, args=(c,))
+                            thread.start()
 
             if msg[0] == 'stop':
                 try:
-                    # self.proc.terminate()
-                    # self.proc.wait()
                     if len(pid) > 0:
                         for p in pid:
                             os.killpg(p, signal.SIGTERM)
