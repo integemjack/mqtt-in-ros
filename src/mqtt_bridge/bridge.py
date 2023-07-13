@@ -91,6 +91,7 @@ class RosToMqttBridge(Bridge):
         global labels, stop, pid
 
         if stop:
+            stop = False
             if len(pid) > 0:
                 for p in pid:
                     os.killpg(p, signal.SIGTERM)
