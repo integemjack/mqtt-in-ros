@@ -90,83 +90,86 @@ class RosToMqttBridge(Bridge):
     def _publish(self, msg: rospy.Message):
         global labels, stop, pid
 
-        if stop:
-            stop = False
-            if len(pid) > 0:
-                for p in pid:
-                    os.killpg(p, signal.SIGTERM)
-                pid = []
-                rospy.loginfo("stoped!")
+        try:
+            if stop:
+                stop = False
+                if len(pid) > 0:
+                    for p in pid:
+                        os.killpg(p, signal.SIGTERM)
+                    pid = []
+                    rospy.loginfo("stoped!")
 
-        rospy.loginfo("MQTT send from {}".format(self._topic_to))
-        # rospy.loginfo(msg.detections)
-        if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
-            # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
-            payload = ",".join(['%s' % (d.id[0]) for d in msg.detections])
-            #             payload = "[{}]".format(payload)
-        elif (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagSize'):
-            # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
-            payload_json = [
-                {
-                    'id': d.id[0],
-                    'position': {
-                        'x': d.pose.pose.pose.position.x,
-                        'y': d.pose.pose.pose.position.y,
-                        'z': d.pose.pose.pose.position.z
-                    },
-                    'orientation': {
-                        'x': d.pose.pose.pose.orientation.x,
-                        'y': d.pose.pose.pose.orientation.y,
-                        'z': d.pose.pose.pose.orientation.z,
-                        'w': d.pose.pose.pose.orientation.w
-                    }
-                }
-                for d in msg.detections
-            ]
-            payload = json.dumps(payload_json)
-            #             payload = "[{}]".format(payload)
-        elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
-            payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
-                               for d in msg.bounding_boxes])
-        elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetSize'):
-            # print(msg.detections)
-            payload_json = [
-                {
-                    'id': d.results[0].id,
-                    'label': labels[d.results[0].id],
-                    'score': d.results[0].score,
-                    'bbox': {
-                        'center': {
-                            'x': d.bbox.center.x,
-                            'y': d.bbox.center.y,
-                            'theta': d.bbox.center.theta
+            rospy.loginfo("MQTT send from {}".format(self._topic_to))
+            # rospy.loginfo(msg.detections)
+            if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
+                # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+                payload = ",".join(['%s' % (d.id[0]) for d in msg.detections])
+                #             payload = "[{}]".format(payload)
+            elif (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagSize'):
+                # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+                payload_json = [
+                    {
+                        'id': d.id[0],
+                        'position': {
+                            'x': d.pose.pose.pose.position.x,
+                            'y': d.pose.pose.pose.position.y,
+                            'z': d.pose.pose.pose.position.z
                         },
-                        'size_x': d.bbox.size_x,
-                        'size_y': d.bbox.size_y
+                        'orientation': {
+                            'x': d.pose.pose.pose.orientation.x,
+                            'y': d.pose.pose.pose.orientation.y,
+                            'z': d.pose.pose.pose.orientation.z,
+                            'w': d.pose.pose.pose.orientation.w
+                        }
                     }
-                }
-                for d in msg.detections
-            ]
-            payload = json.dumps(payload_json)
-        elif (self._topic_from == '/detectnet/vision_info' and self._topic_to == 'vision_info'):
-            # Define the directory
-            dir_path = msg.method
+                    for d in msg.detections
+                ]
+                payload = json.dumps(payload_json)
+                #             payload = "[{}]".format(payload)
+            elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
+                payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
+                                    for d in msg.bounding_boxes])
+            elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetSize'):
+                # print(msg.detections)
+                payload_json = [
+                    {
+                        'id': d.results[0].id,
+                        'label': labels[d.results[0].id],
+                        'score': d.results[0].score,
+                        'bbox': {
+                            'center': {
+                                'x': d.bbox.center.x,
+                                'y': d.bbox.center.y,
+                                'theta': d.bbox.center.theta
+                            },
+                            'size_x': d.bbox.size_x,
+                            'size_y': d.bbox.size_y
+                        }
+                    }
+                    for d in msg.detections
+                ]
+                payload = json.dumps(payload_json)
+            elif (self._topic_from == '/detectnet/vision_info' and self._topic_to == 'vision_info'):
+                # Define the directory
+                dir_path = msg.method
 
-            # Get the .txt files in the directory
-            txt_files = glob.glob(os.path.join(
-                os.path.dirname(dir_path), '*.txt'))
+                # Get the .txt files in the directory
+                txt_files = glob.glob(os.path.join(
+                    os.path.dirname(dir_path), '*.txt'))
 
-            # For each .txt file
-            for txt_file in txt_files:
-                # Open the file
-                with open(txt_file, 'r') as f:
-                    # Read the lines and convert each line into an element of a list
-                    lines = [line.strip() for line in f]
-                    labels = lines
-            payload = json.dumps(labels)
-        else:
-            payload = yaml.dump(msg)
-        self._mqtt_client.publish(topic=self._topic_to, payload=payload)
+                # For each .txt file
+                for txt_file in txt_files:
+                    # Open the file
+                    with open(txt_file, 'r') as f:
+                        # Read the lines and convert each line into an element of a list
+                        lines = [line.strip() for line in f]
+                        labels = lines
+                payload = json.dumps(labels)
+            else:
+                payload = yaml.dump(msg)
+            self._mqtt_client.publish(topic=self._topic_to, payload=payload)
+        except Exception as e:
+            pass
 
 
 class MqttToRosBridge(Bridge):
