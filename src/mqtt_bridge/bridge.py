@@ -247,17 +247,17 @@ class MqttToRosBridge(Bridge):
 
             if msg[0] == 'stop':
                 stop = True
-                # try:
-                #     if len(pid) > 0:
-                #         for p in pid:
-                #             os.killpg(p, signal.SIGTERM)
-                #         pid = []
-                #         rospy.loginfo("stoped!")
-                #     else:
-                #         rospy.loginfo("no stop!")
-                # except:
-                #     rospy.loginfo("no ros to stop...")
-                # stop = False
+                try:
+                    if len(pid) > 0:
+                        for p in pid:
+                            os.killpg(p, signal.SIGTERM)
+                        pid = []
+                        rospy.loginfo("stoped!")
+                    else:
+                        rospy.loginfo("no stop!")
+                except:
+                    rospy.loginfo("no ros to stop...")
+                stop = False
 
             if self._topic_to != "":
                 if self._interval is None or now - self._last_published >= self._interval:
