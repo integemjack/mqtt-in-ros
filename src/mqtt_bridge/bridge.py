@@ -76,12 +76,13 @@ class RosToMqttBridge(Bridge):
         rospy.Subscriber(topic_from, msg_type, self._callback_ros)
 
     def _callback_ros(self, msg: rospy.Message):
-        rospy.loginfo("ROS received from {}".format(self._topic_from))
+        # rospy.loginfo("ROS received from {}".format(self._topic_from))
         if (self._topic_from == '/tag_detections'):
             # rospy.loginfo(msg.detections[0].id[0])
-            rospy.loginfo(len(msg.detections))
+            # rospy.loginfo(len(msg.detections))
             if (len(msg.detections) == 0):
-                return rospy.loginfo("MQTT: No DATA to {}".format(self._topic_to))
+                # rospy.loginfo("MQTT: No DATA to {}".format(self._topic_to))
+                return
         now = rospy.get_time()
         if now - self._last_published >= self._interval:
             self._publish(msg)
@@ -99,7 +100,7 @@ class RosToMqttBridge(Bridge):
                     pid = []
                     rospy.loginfo("stoped!")
 
-            rospy.loginfo("MQTT send from {}".format(self._topic_to))
+            # rospy.loginfo("MQTT send from {}".format(self._topic_to))
             # rospy.loginfo(msg.detections)
             if (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagContent'):
                 # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
@@ -206,14 +207,14 @@ class MqttToRosBridge(Bridge):
 
     def _callback_mqtt(self, client: mqtt.Client, userdata: Dict, mqtt_msg: mqtt.MQTTMessage):
         """ callback from MQTT """
-        rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
-        rospy.loginfo(mqtt_msg.payload)
+        # rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
+        # rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
         global pid, stop
 
         try:
             msg = mqtt_msg.payload.decode('UTF-8').split("|")
-            rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split("|"))
+            # rospy.loginfo(mqtt_msg.payload.decode('UTF-8').split("|"))
 
             if msg[0] == 'start':
                 cmd = []
@@ -236,7 +237,7 @@ class MqttToRosBridge(Bridge):
                 elif msg[1] == 'apriltag':
                     cmd = ["cd /home/nvidia/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch", "sleep:5",
                            "cd /home/nvidia/apriltag_ws/devel_isolated && source setup.bash && roslaunch apriltag_ros continuous_detection.launch"]
-                rospy.loginfo(cmd)
+                # rospy.loginfo(cmd)
                 # , preexec_fn=os.setsid)
                 if len(cmd) > 0:
                     for c in cmd:
