@@ -18,6 +18,7 @@ from .util import lookup_object, extract_values, populate_instance
 
 pid = []
 labels = []
+stop = False
 
 
 def f():
@@ -87,7 +88,14 @@ class RosToMqttBridge(Bridge):
             self._last_published = now
 
     def _publish(self, msg: rospy.Message):
-        global labels
+        global labels, stop, pid
+
+        if stop:
+            if len(pid) > 0:
+                for p in pid:
+                    os.killpg(p, signal.SIGTERM)
+                pid = []
+                rospy.loginfo("stoped!")
 
         rospy.loginfo("MQTT send from {}".format(self._topic_to))
         # rospy.loginfo(msg.detections)
@@ -197,7 +205,7 @@ class MqttToRosBridge(Bridge):
         rospy.loginfo("MQTT received from {}".format(mqtt_msg.topic))
         rospy.loginfo(mqtt_msg.payload)
         now = rospy.get_time()
-        global pid
+        global pid, stop
 
         try:
             msg = mqtt_msg.payload.decode('UTF-8').split("|")
@@ -237,16 +245,18 @@ class MqttToRosBridge(Bridge):
                             thread.start()
 
             if msg[0] == 'stop':
-                try:
-                    if len(pid) > 0:
-                        for p in pid:
-                            os.killpg(p, signal.SIGTERM)
-                        pid = []
-                        rospy.loginfo("stoped!")
-                    else:
-                        rospy.loginfo("no stop!")
-                except:
-                    rospy.loginfo("no ros to stop...")
+                stop = True
+                # try:
+                #     if len(pid) > 0:
+                #         for p in pid:
+                #             os.killpg(p, signal.SIGTERM)
+                #         pid = []
+                #         rospy.loginfo("stoped!")
+                #     else:
+                #         rospy.loginfo("no stop!")
+                # except:
+                #     rospy.loginfo("no ros to stop...")
+                # stop = False
 
             if self._topic_to != "":
                 if self._interval is None or now - self._last_published >= self._interval:
