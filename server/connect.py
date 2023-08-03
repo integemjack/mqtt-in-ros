@@ -36,6 +36,7 @@ def get_lan_ip():
     except:
         return None
 
+
 def exec_command(command):
     global commands, logs
     print(command)
@@ -63,7 +64,8 @@ def exec_command(command):
                 success = "true"
                 if error_line != "":
                     success = "false"
-                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, thisPid, output_line, error_line)
+                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (
+                    success, thisPid, output_line, error_line)
 
         except Exception as e:
             buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
@@ -71,6 +73,7 @@ def exec_command(command):
         buf = "{\"suceesss\": false, \"error\": \"No command param\"}"
 
     return buf, thisPid
+
 
 def watch(self, pid, once=False, output=True):
     if pid:
@@ -90,12 +93,14 @@ def watch(self, pid, once=False, output=True):
             # Get the current stdout flags
             flags = fcntl.fcntl(commandThis.stdout, fcntl.F_GETFL)
             # Set the stdout to non-blocking
-            fcntl.fcntl(commandThis.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            fcntl.fcntl(commandThis.stdout, fcntl.F_SETFL,
+                        flags | os.O_NONBLOCK)
 
             # Get the current stdout flags
             flagse = fcntl.fcntl(commandThis.stderr, fcntl.F_GETFL)
             # Set the stdout to non-blocking
-            fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL, flagse | os.O_NONBLOCK)
+            fcntl.fcntl(commandThis.stderr, fcntl.F_SETFL,
+                        flagse | os.O_NONBLOCK)
 
             # i = 0
 
@@ -107,19 +112,19 @@ def watch(self, pid, once=False, output=True):
                 returncode = commandThis.poll()
                 if returncode is not None:
                     logs[pid] = b''
-                    output_line = commandThis.stdout.read()#.decode('utf-8')
+                    output_line = commandThis.stdout.read()  # .decode('utf-8')
                     if output_line and output:
-                        self.wfile.write(output_line) #.encode('utf-8')
+                        self.wfile.write(output_line)  # .encode('utf-8')
 
-                    error_line = commandThis.stderr.read()#.decode('utf-8')
+                    error_line = commandThis.stderr.read()  # .decode('utf-8')
                     if error_line and output:
-                        self.wfile.write(error_line) #.encode('utf-8')
+                        self.wfile.write(error_line)  # .encode('utf-8')
 
                     self.wfile.write(("exit(%d)" % returncode).encode())
                     break
 
                 # print('读取%d次数据...stdout.' % i)
-                output_line = commandThis.stdout.read()#.decode('utf-8')
+                output_line = commandThis.stdout.read()  # .decode('utf-8')
                 if output_line:
                     logs[pid] += output_line
                     if output:
@@ -127,7 +132,7 @@ def watch(self, pid, once=False, output=True):
                         self.wfile.flush()
 
                 # print('读取%d次数据...stderr.' % i)
-                error_line = commandThis.stderr.read()#.decode('utf-8')
+                error_line = commandThis.stderr.read()  # .decode('utf-8')
                 if error_line:
                     logs[pid] += error_line
                     if output:
@@ -141,7 +146,7 @@ def watch(self, pid, once=False, output=True):
                     print('网页关闭.')
                     # Check if the connection is closed
                     break
-                
+
                 if once and logs[pid] != b'':
                     break
                 # time.sleep(1)
@@ -157,8 +162,11 @@ def watch(self, pid, once=False, output=True):
 
     return buf
 
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     pass
+
+
 class Resquest(BaseHTTPRequestHandler):
     timeout = 5
     server_version = "ROS"
@@ -228,7 +236,8 @@ class Resquest(BaseHTTPRequestHandler):
                 success = "true"
                 if error_line != "":
                     success = "false"
-                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (success, pid, output_line, error_line)
+                buf = "{\"suceesss\": %s, \"pid\": %d, \"stdout\": \"%s\", \"error\": \"%s\"}" % (
+                    success, pid, output_line, error_line)
                 pid = 0
 
         elif path == '/stop':
@@ -236,8 +245,8 @@ class Resquest(BaseHTTPRequestHandler):
                 # print("id:", self.proc)
                 # self.proc.terminate()
                 # self.proc.wait()
-                print(params['pid'])
-                if len(params['pid']) > 0:
+                # print(params['pid'])
+                if "pid" in params:
                     print("pid", params['pid'])
                     os.killpg(int(params['pid'][0]), signal.SIGTERM)
                     print("stoped!")
@@ -267,10 +276,14 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command(params['command'][0])
 
         elif path == '/watch':
-            buf = watch(self, params['pid'][0])
+            if 'pid' in params:
+                buf = watch(self, params['pid'][0])
+            else:
+                buf = watch(self, str(pid))
 
         elif path == '/jupyter':
-            buf, thisPid = exec_command("cd /home/nvidia/mqtt_ws/src/mqtt && source /home/nvidia/myenv/bin/activate && source /opt/ros/melodic/setup.bash && source /home/nvidia/mqtt_ws/devel/setup.bash && jupyter lab --port 2013 --allow-root")
+            buf, thisPid = exec_command(
+                "cd /home/nvidia/mqtt_ws/src/mqtt && source /home/nvidia/myenv/bin/activate && source /opt/ros/melodic/setup.bash && source /home/nvidia/mqtt_ws/devel/setup.bash && jupyter lab --port 2013 --allow-root")
             time.sleep(3)
             try:
                 log = ""
@@ -290,10 +303,11 @@ class Resquest(BaseHTTPRequestHandler):
                     match = re.search(r'token=([a-zA-Z0-9]+)', log)
                     if match:
                         token = match.group(1)
-                        print(token)  # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
+                        # 输出: 87a841ac9af475641528eb1610494ed256b1e966673f076d
+                        print(token)
 
-
-                url = "http://{}:{}/lab?token={}".format(get_lan_ip(), port, token)
+                url = "http://{}:{}/lab?token={}".format(
+                    get_lan_ip(), port, token)
 
                 print("url=", end="")
                 print(url)
@@ -304,7 +318,6 @@ class Resquest(BaseHTTPRequestHandler):
             except Exception as e:
                 buf = "{\"suceesss\": false, \"error\": \"%s\"}" % e
 
-        
         if path == '/jupyter':
             pass
         else:
@@ -324,7 +337,8 @@ class Resquest(BaseHTTPRequestHandler):
             postvars = cgi.parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers.get('Content-Length'))
-            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+            postvars = cgi.parse_qs(
+                self.rfile.read(length), keep_blank_values=1)
         elif ctype == 'text/plain':
             content_length = int(self.headers.get('Content-Length'))
             post_data = self.rfile.read(content_length)
@@ -341,9 +355,11 @@ class Resquest(BaseHTTPRequestHandler):
             elif isinstance(value, bytes):
                 value = value.decode("utf-8")
             elif isinstance(value, list):
-                value = [(item.encode("utf-8") if isinstance(item, str) else item.decode("utf-8")) for item in value][0]
+                value = [(item.encode("utf-8") if isinstance(item, str)
+                          else item.decode("utf-8")) for item in value][0]
             elif isinstance(value, dict):
-                value = {(k if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8") if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
+                value = {(k if isinstance(k, str) else k.decode("utf-8")): (v.encode("utf-8")
+                                                                            if isinstance(v, str) else v.decode("utf-8")) for k, v in value.items()}
             if isinstance(key, str):
                 postvars_utf8[key] = value
             else:
@@ -351,7 +367,6 @@ class Resquest(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header("Content-type", "text/json")
-
 
         print(postvars_utf8)
         topic = postvars_utf8['machineid']
@@ -368,7 +383,7 @@ class Resquest(BaseHTTPRequestHandler):
 
         if path == '/command':
             buf, thisPid = exec_command(postvars_utf8['command'])
-        
+
         self.end_headers()
         self.wfile.write(buf.encode())
 
@@ -416,15 +431,17 @@ if __name__ == '__main__':
             with canvas(device) as draw:
                 draw.text((20, 20), "IP Address:", fill="white")
                 draw.text((20, 30), get_lan_ip(), fill="white")
-                writeFile('/home/nvidia/Desktop/connect.log', 'LCD操作完成!\n', status='a')
+                writeFile('/home/nvidia/Desktop/connect.log',
+                          'LCD操作完成!\n', status='a')
                 lcd = True
         except Exception as e:
             print(e)
-            writeFile('/home/nvidia/Desktop/connect.log', str(e) + '\n', status='a')
-        ts+=1
+            writeFile('/home/nvidia/Desktop/connect.log',
+                      str(e) + '\n', status='a')
+        ts += 1
         if ts > 500:
             break
-    
+
     server = ThreadedHTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
     server.serve_forever()
