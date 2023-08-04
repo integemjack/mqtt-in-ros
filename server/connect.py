@@ -276,10 +276,7 @@ class Resquest(BaseHTTPRequestHandler):
             buf, thisPid = exec_command(params['command'][0])
 
         elif path == '/watch':
-            if 'pid' in params:
-                buf = watch(self, params['pid'][0])
-            else:
-                buf = watch(self, str(pid))
+            buf = watch(self, params['pid'][0])
 
         elif path == '/jupyter':
             buf, thisPid = exec_command(
