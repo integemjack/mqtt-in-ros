@@ -13,8 +13,27 @@ import atexit
 import time
 import json
 import glob
+import serial
+import math
 
-from .util import lookup_object, extract_values, populate_instance
+# 初始化串口
+ser = serial.Serial(
+    port='/dev/ttyTHS1',  # 在Jetson Nano上，UART1通常是'/dev/ttyTHS1'
+    baudrate=115200,        # 波特率
+    timeout=1             # 超时设置
+)
+
+# # 确保串口是打开的
+# if ser.isOpen():
+#     print("Serial port is open.")
+# else:
+#     print("Serial port is not open. Exiting.")
+#     exit()
+
+# # 清空输入和输出缓冲区
+# ser.flushInput()
+# ser.flushOutput()
+
 
 pid = []
 labels = []
@@ -33,6 +52,28 @@ def f():
 
 
 atexit.register(f)
+
+
+def quaternion_to_euler(x, y, z, w):
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + y * y)
+    roll_x = math.atan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = math.asin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (y * y + z * z)
+    yaw_z = math.atan2(t3, t4)
+
+    # 转换为角度
+    roll_x = math.degrees(roll_x)
+    pitch_y = math.degrees(pitch_y)
+    yaw_z = math.degrees(yaw_z)
+
+    return roll_x, pitch_y, yaw_z  # in degrees
 
 
 def create_bridge(factory: Union[str, "Bridge"], msg_type: Union[str, Type[rospy.Message]], topic_from: str,
@@ -108,6 +149,8 @@ class RosToMqttBridge(Bridge):
                 #             payload = "[{}]".format(payload)
             elif (self._topic_from == '/tag_detections' and self._topic_to == 'apriltagSize'):
                 # self._serialize(msg.detections[0].id[0])  # extract_values(msg))
+                # roll, pitch, yaw = quaternion_to_euler(d.pose.pose.pose.orientation.x, d.pose.pose.pose.orientation.y, d.pose.pose.pose.orientation.z, d.pose.pose.pose.orientation.w)
+                # print(roll, pitch, yaw)
                 payload_json = [
                     {
                         'id': d.id[0],
@@ -121,11 +164,32 @@ class RosToMqttBridge(Bridge):
                             'y': d.pose.pose.pose.orientation.y,
                             'z': d.pose.pose.pose.orientation.z,
                             'w': d.pose.pose.pose.orientation.w
+                        },
+                        'angle': {
+                            'roll': roll,
+                            'pitch': pitch,
+                            'yaw': yaw
                         }
                     }
                     for d in msg.detections
+                    for roll, pitch, yaw in [quaternion_to_euler(d.pose.pose.pose.orientation.x, d.pose.pose.pose.orientation.y, d.pose.pose.pose.orientation.z, d.pose.pose.pose.orientation.w)]
                 ]
+
+                if ser.isOpen():
+                    # 提取所有'angle'和'id'字段并赋值给新的变量
+                    angle_id_list = {d['id']: round(
+                        d['angle']['yaw'], 2) for d in payload_json if 'id' in d and 'angle' in d and 'yaw' in d['angle']}
+                    # [{'id': d['id'], 'angle': d['angle']} for d in payload_json if 'angle' in d and 'id' in d]
+
+                    filtered_id_yaw_dict = {
+                        k: v for k, v in angle_id_list.items() if k != 0}
+
+                    # 将 angle_id_list 转换为 JSON 格式的字符串
+                    angle_id_str = json.dumps(filtered_id_yaw_dict)
+                    ser.write(angle_id_str.encode('utf-8'))
+
                 payload = json.dumps(payload_json)
+                # ser.write(payload.encode('utf-8'))
                 #             payload = "[{}]".format(payload)
             elif (self._topic_from == '/detectnet/detections' and self._topic_to == 'detectnetContent'):
                 payload = ",".join(['%s:%.2f' % (d.Class, d.probability)
@@ -149,6 +213,7 @@ class RosToMqttBridge(Bridge):
                     }
                     for d in msg.detections
                 ]
+
                 payload = json.dumps(payload_json)
             elif (self._topic_from == '/detectnet/vision_info' and self._topic_to == 'vision_info'):
                 # Define the directory
