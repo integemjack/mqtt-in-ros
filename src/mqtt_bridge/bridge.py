@@ -39,6 +39,7 @@ pid = []
 labels = []
 stop = False
 
+from .util import lookup_object, extract_values, populate_instance
 
 def f():
     global pid
