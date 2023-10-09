@@ -1,13 +1,14 @@
 # 1 启动 usb camera
 
 ```bash
+vim /home/nvidia/usb_cam_ws/src/usb_cam/launch/usb_cam-test.launch
 cd /home/nvidia/usb_cam_ws/devel && source setup.bash && roslaunch usb_cam usb_cam-test.launch
 ```
 
 # 2 启动标记程序
 
 ```bash
-rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.024 image:=/usb_cam/image_raw camera:=/usb_cam
+rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.011 image:=/usb_cam/image_raw camera:=/usb_cam
 # 标记图片地址
 # https://img-blog.csdnimg.cn/20190417091331789.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2N1bmd1ZGFmYQ==,size_16,color_FFFFFF,t_70
 ```
